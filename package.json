@@ -12,7 +12,7 @@
     "lint": "tsc -b --pretty",
     "preview": "rsbuild preview",
     "start": "cd ./dist && deno run --allow-net --allow-read server.cjs",
-    "deploy": "npm run build:client && gh-pages -d dist/web"
+    "deploy": "pnpm run build:client && gh-pages -d dist/web"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.4",
