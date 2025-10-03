@@ -47,6 +47,8 @@ jobs:
 
       - name: Build client
         run: pnpm run build:client
+        env:
+          NODE_ENV: production
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v3
@@ -54,3 +56,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/web
           publish_branch: gh-pages
+          cname: xyy.gta4.bio
