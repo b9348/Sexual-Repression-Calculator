@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 问卷主界面组件 - 管理整个问卷流程
  * 包括题目展示、进度跟踪、答案保存等核心功能
  */
@@ -21,6 +21,7 @@ interface QuestionnaireSectionProps {
   onResponseUpdate: (responses: Response[]) => void;
   onComplete: () => void;
   onBack?: () => void;
+  resumeToken?: number | null;
 }
 
 export function QuestionnaireSection({
@@ -29,6 +30,7 @@ export function QuestionnaireSection({
   responses,
   onResponseUpdate,
   onComplete,
+  resumeToken,
   onBack
 }: QuestionnaireSectionProps) {
   // 使用新的列表模式显示问卷
@@ -40,6 +42,7 @@ export function QuestionnaireSection({
       onResponseUpdate={onResponseUpdate}
       onComplete={onComplete}
       onBack={onBack}
+      resumeToken={resumeToken}
     />
   );
 

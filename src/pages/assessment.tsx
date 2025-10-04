@@ -47,6 +47,7 @@ export default function Assessment() {
   } | null>(null);
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const [hasCheckedProgress, setHasCheckedProgress] = useState(false);
+  const [resumeToken, setResumeToken] = useState<number | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -131,6 +132,7 @@ export default function Assessment() {
     setCurrentStep('questionnaire');
     setPendingProgress(null);
     setShowProgressDialog(false);
+    setResumeToken(Date.now());
     setHasCheckedProgress(true);
   };
 
@@ -142,6 +144,7 @@ export default function Assessment() {
     setDemographics(null);
     setResponses([]);
     setCurrentStep('consent');
+    setResumeToken(null);
 
     if (session) {
       setSession({
@@ -382,6 +385,7 @@ export default function Assessment() {
             responses={responses}
             onResponseUpdate={handleResponseUpdate}
             onComplete={handleQuestionnaireComplete}
+            resumeToken={resumeToken}
             onBack={handleBack}
           />
         )}
