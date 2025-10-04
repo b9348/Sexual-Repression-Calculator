@@ -31,12 +31,70 @@ export default function Assessment() {
   const [demographics, setDemographics] = useState<Demographics | null>(null);
   const [responses, setResponses] = useState<Response[]>([]);
   const [session, setSession] = useState<AssessmentSession | null>(null);
+  const [progressRestored, setProgressRestored] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [currentStep]);
 
+  useEffect(() => {
+    if (progressRestored || !session) {
+      return;
+    }
+
+    const savedProgress = localStorage.getItem('sri_assessment_progress');
+    if (!savedProgress) {
+      setProgressRestored(true);
+      return;
+    }
+
+    try {
+      const data = JSON.parse(savedProgress);
+      if (data.type !== assessmentType) {
+        setProgressRestored(true);
+        return;
+      }
+
+      const savedDemographics = data.demographics as Demographics | undefined;
+      const savedResponsesRaw = Array.isArray(data.responses) ? data.responses : [];
+      const restoredResponses: Response[] = savedResponsesRaw.map((item: Response) => ({
+        ...item,
+        timestamp: new Date(item.timestamp),
+      }));
+
+      if (savedDemographics) {
+        setDemographics(savedDemographics);
+      }
+
+      if (restoredResponses.length > 0) {
+        setResponses(restoredResponses);
+
+        const updatedSession: AssessmentSession = {
+          ...session,
+          demographics: savedDemographics || session.demographics,
+          responses: restoredResponses
+        };
+
+        setSession(updatedSession);
+        saveAssessmentSession(updatedSession);
+        setCurrentStep('questionnaire');
+      } else if (savedDemographics) {
+        const updatedSession: AssessmentSession = {
+          ...session,
+          demographics: savedDemographics
+        };
+        setSession(updatedSession);
+        saveAssessmentSession(updatedSession);
+      }
+    } catch (error) {
+      console.error('恢复进度失败:', error);
+    } finally {
+      setProgressRestored(true);
+    }
+  }, [assessmentType, session, progressRestored]);
+
   // 初始化会话
+
   useEffect(() => {
     const newSession: AssessmentSession = {
       id: sessionId,
@@ -300,4 +358,5 @@ export default function Assessment() {
     </div>
   );
 }
+
 
