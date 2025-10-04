@@ -1,9 +1,9 @@
-﻿/**
+/**
  * 问卷列表组件 - 以列表形式显示所有问卷题目
  * 提供完整的题目概览和横向选项布局
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -35,9 +35,9 @@ interface QuestionnaireListProps {
   demographics: Demographics;
   responses: Response[];
   onResponseUpdate: (responses: Response[]) => void;
-  resumeToken?: number | null;
   onComplete: () => void;
   onBack?: () => void;
+  resumeToken?: number | null;
 }
 
 // 分页导航组件 - 统一的翻页组件，支持快捷翻页
@@ -141,14 +141,108 @@ function PaginationNav({ currentPage, totalPages, onPageChange }: PaginationProp
   );
 }
 
+function PaginationNav({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  const canGoPrev = currentPage > 0;
+  const canGoNext = currentPage < totalPages - 1;
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const goToPrev = () => {
+    if (canGoPrev) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (canGoNext) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
+  // 当前页变化时，自动滚动到可视区域
+  React.useEffect(() => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const activeButton = container.querySelector(`[data-page="${currentPage}"]`) as HTMLElement;
+
+      if (activeButton) {
+        // 计算按钮相对于容器的位置
+        const containerWidth = container.clientWidth;
+        const buttonLeft = activeButton.offsetLeft;
+        const buttonWidth = activeButton.offsetWidth;
+
+        // 滚动到按钮居中位置
+        container.scrollTo({
+          left: buttonLeft - containerWidth / 2 + buttonWidth / 2,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [currentPage]);
+
+  return (
+    <div className="flex items-center justify-between gap-2 sm:gap-4">
+      <Button
+        variant="outline"
+        onClick={goToPrev}
+        disabled={!canGoPrev}
+        className="flex items-center gap-1 sm:gap-2 transition-all hover:scale-105 disabled:hover:scale-100 shrink-0 h-9 px-2 sm:px-4"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        <span className="hidden sm:inline text-sm">上一页</span>
+      </Button>
+
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <span className="text-xs sm:text-sm text-muted-foreground shrink-0 hidden md:inline">
+          {currentPage + 1} / {totalPages}
+        </span>
+        {/* 快捷翻页按钮 - 横向滚动容器 */}
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-1 overflow-x-auto overflow-y-hidden flex-1 py-1"
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              data-page={i}
+              onClick={() => onPageChange(i)}
+              className={`
+                w-8 h-8 rounded text-xs font-medium transition-all duration-200 shrink-0
+                ${i === currentPage
+                  ? 'bg-psychology-primary text-white scale-110 shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105'
+                }
+              `}
+              aria-label={`第 ${i + 1} 页`}
+              aria-current={i === currentPage ? 'page' : undefined}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        onClick={goToNext}
+        disabled={!canGoNext}
+        className="flex items-center gap-1 sm:gap-2 transition-all hover:scale-105 disabled:hover:scale-100 shrink-0 h-9 px-2 sm:px-4"
+      >
+        <span className="hidden sm:inline text-sm">下一页</span>
+        <ChevronRight className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+}
+
 export function QuestionnaireList({
   type,
   demographics,
   responses,
   onResponseUpdate,
   onComplete,
-  resumeToken,
-  onBack
+  onBack,
+  resumeToken
 }: QuestionnaireListProps) {
   // 根据用户特征选择适应性量表
   const getScalesForUser = () => {
@@ -184,26 +278,7 @@ export function QuestionnaireList({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [currentPage, type]);
-  useEffect(() => {
-    if (!scrollToQuestionId) {
-      return;
-    }
 
-    const timer = window.setTimeout(() => {
-      const targetElement = document.getElementById(`question-${scrollToQuestionId}`);
-      if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }, 150);
-
-    return () => window.clearTimeout(timer);
-  }, [scrollToQuestionId, currentPage]);
   // 自动保存功能 - 使用debounced保存避免频繁操作
   useEffect(() => {
     if (responses.length > 0) {
@@ -256,30 +331,51 @@ export function QuestionnaireList({
   };
   
   const currentPageQuestions = getCurrentPageQuestions();
-
   useEffect(() => {
-    if (!resumeToken) {
+    if (!scrollToQuestionId) {
       return;
     }
 
-    const firstUnanswered = allQuestions.find((question) =>
-      !responses.some((response) => response.questionId === question.id)
+    const timer = window.setTimeout(() => {
+      const targetElement = document.getElementById(`question-${scrollToQuestionId}`);
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+      setScrollToQuestionId(null);
+    }, usesPagination ? 250 : 150);
+
+    return () => window.clearTimeout(timer);
+  }, [scrollToQuestionId, usesPagination, currentPage]);
+  const resumeHandledRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!resumeToken || resumeHandledRef.current === resumeToken) {
+      return;
+    }
+
+    resumeHandledRef.current = resumeToken;
+
+    const firstUnanswered = allQuestions.find(question =>
+      !responses.some(response => response.questionId === question.id)
     );
 
     if (!firstUnanswered) {
       return;
     }
 
+    let targetPage = currentPage;
     if (usesPagination) {
-      const questionIndex = allQuestions.findIndex((question) => question.id === firstUnanswered.id);
+      const questionIndex = allQuestions.findIndex(question => question.id === firstUnanswered.id);
       if (questionIndex !== -1) {
-        const targetPage = Math.floor(questionIndex / questionsPerPage);
-        if (targetPage !== currentPage) {
-          setCurrentPage(targetPage);
-          setScrollToQuestionId(firstUnanswered.id);
-          return;
-        }
+        targetPage = Math.floor(questionIndex / questionsPerPage);
       }
+    }
+
+    if (targetPage !== currentPage) {
+      setCurrentPage(targetPage);
     }
 
     setScrollToQuestionId(firstUnanswered.id);

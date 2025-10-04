@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 评估页面 - 问卷系统主界面
  * 负责管理整个评估流程，包括知情同意、人口学信息、量表问卷等
  */
@@ -16,7 +16,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { AlertTriangle, CheckCircle, ArrowLeft, Home, Brain } from 'lucide-react';
 import { AssessmentSession, Demographics, Response } from '@/types';
@@ -51,10 +51,6 @@ export default function Assessment() {
   const [resumeToken, setResumeToken] = useState<number | null>(null);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [currentStep]);
-
-  useEffect(() => {
     if (hasCheckedProgress) {
       return;
     }
@@ -75,7 +71,7 @@ export default function Assessment() {
       const savedDemographics = data.demographics as Demographics | undefined;
       type RawResponse = { questionId: string; value: number; timestamp: string };
       const rawResponses: RawResponse[] = Array.isArray(data.responses) ? data.responses : [];
-      const restoredResponses: Response[] = rawResponses.map((item) => ({
+      const restoredResponses: Response[] = rawResponses.map(item => ({
         questionId: item.questionId,
         value: item.value,
         timestamp: new Date(item.timestamp),
@@ -134,23 +130,25 @@ export default function Assessment() {
     setSession(updatedSession);
     saveAssessmentSession(updatedSession);
 
-    setCurrentStep("questionnaire");
+    setCurrentStep('questionnaire');
     setPendingProgress(null);
     setShowProgressDialog(false);
     setResumeToken(Date.now());
     setHasCheckedProgress(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDiscardProgress = () => {
     closingProgressDialogRef.current = true;
-    localStorage.removeItem("sri_assessment_progress");
+    localStorage.removeItem('sri_assessment_progress');
     setPendingProgress(null);
     setShowProgressDialog(false);
     setHasCheckedProgress(true);
     setDemographics(null);
     setResponses([]);
-    setCurrentStep("consent");
+    setCurrentStep('consent');
     setResumeToken(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (session) {
       setSession({
@@ -180,8 +178,8 @@ export default function Assessment() {
 
     setShowProgressDialog(open);
   };
-  // 初始化会话
 
+  // 初始化会话
   useEffect(() => {
     const newSession: AssessmentSession = {
       id: sessionId,
@@ -298,18 +296,26 @@ export default function Assessment() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
       <AlertDialog open={showProgressDialog} onOpenChange={handleProgressDialogOpenChange}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>检测到未完成的评估</AlertDialogTitle>
-            <AlertDialogDescription>
+        <AlertDialogContent className="max-w-[calc(100%-2rem)] sm:max-w-sm rounded-xl p-6 space-y-6">
+          <AlertDialogHeader className="space-y-3 text-center">
+            <AlertDialogTitle className="text-xl font-semibold">
+              检测到未完成的评估
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
               检测到本地保存的未完成评估，已回答 {pendingProgress?.responses.length ?? 0} 道题。请选择继续作答或重新开始。
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDiscardProgress}>
+          <AlertDialogFooter className="sm:justify-center gap-2">
+            <AlertDialogCancel
+              onClick={handleDiscardProgress}
+              className="w-full sm:w-auto transition-transform hover:scale-[1.02]"
+            >
               重新开始
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleContinueProgress}>
+            <AlertDialogAction
+              onClick={handleContinueProgress}
+              className="w-full sm:w-auto bg-psychology-primary hover:bg-psychology-primary/90 transition-transform hover:scale-[1.02]"
+            >
               继续作答
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -464,6 +470,3 @@ export default function Assessment() {
     </div>
   );
 }
-
-
-
