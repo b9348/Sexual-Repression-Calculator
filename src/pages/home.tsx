@@ -3,18 +3,18 @@
  * 提供评估介绍、快速开始入口和功能说明
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Brain, 
-  Clock, 
-  Shield, 
-  Users, 
-  BarChart3, 
-  FileText, 
+import {
+  Brain,
+  Clock,
+  Shield,
+  Users,
+  BarChart3,
+  FileText,
   Heart,
   Zap,
   CheckCircle,
@@ -25,7 +25,33 @@ import {
   History
 } from 'lucide-react';
 
+const AD_IMAGE_1 = 'https://img.vercel.bio/file/1759552830850_1.jpg';
+const AD_IMAGE_2 = 'https://img.vercel.bio/file/1759552534653_Screenshot_2025_1004_123439.png';
+const AD_IMAGE_3 = 'https://img.vercel.bio/file/1759551964622_Screenshot_2025_1004_122409.png';
+
 export default function Home() {
+  const [showAd1, setShowAd1] = useState(false);
+  const [showAd2, setShowAd2] = useState(false);
+  const [showAd3, setShowAd3] = useState(false);
+
+  // 预加载广告图片
+  useEffect(() => {
+    const preloadImages = () => {
+      const img1 = new Image();
+      const img2 = new Image();
+      const img3 = new Image();
+      img1.src = AD_IMAGE_1;
+      img2.src = AD_IMAGE_2;
+      img3.src = AD_IMAGE_3;
+    };
+
+    // 延迟预加载，避免阻塞主要内容
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      requestIdleCallback(preloadImages);
+    } else {
+      setTimeout(preloadImages, 100);
+    }
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
       {/* 背景装饰 */}
@@ -50,23 +76,23 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 sm:gap-4">
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/guide">
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  使用指南
+                <Link to="/guide" className="flex items-center">
+                  <BookOpen className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">使用指南</span>
                 </Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/science">
-                  <FileText className="w-4 h-4 mr-2" />
-                  科学依据
+                <Link to="/science" className="flex items-center">
+                  <FileText className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">科学依据</span>
                 </Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/history">
-                  <History className="w-4 h-4 mr-2" />
-                  历史记录
+                <Link to="/history" className="flex items-center">
+                  <History className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">历史记录</span>
                 </Link>
               </Button>
             </div>
@@ -108,7 +134,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
                 <Link to="/assessment?type=quick">
                   <Button size="lg" className="bg-psychology-primary hover:bg-psychology-primary/90 text-white px-8 py-4 text-lg">
                     <Zap className="w-5 h-5 mr-2" />
@@ -116,7 +142,7 @@ export default function Home() {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
-                
+
                 <Link to="/assessment?type=full">
                   <Button size="lg" variant="outline" className="border-psychology-primary text-psychology-primary hover:bg-psychology-primary/5 px-8 py-4 text-lg">
                     <Target className="w-5 h-5 mr-2" />
@@ -124,6 +150,81 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
+
+              {/* 广告按钮区域 */}
+              <div className="flex gap-4 justify-center mb-12">
+                <Button
+                  variant="outline"
+                  className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                  onClick={() => setShowAd1(!showAd1)}
+                >
+                  [广告]0元吃外卖
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                  onClick={() => setShowAd2(!showAd2)}
+                >
+                  [广告]第二家
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-green-500 text-green-600 hover:bg-green-50"
+                  onClick={() => setShowAd3(!showAd3)}
+                >
+                  [广告]第三家
+                </Button>
+              </div>
+
+              {/* 图片模态框 - 第一个广告 */}
+              {showAd1 && (
+                <div
+                  className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                  onClick={() => setShowAd1(false)}
+                >
+                  <div className="max-w-4xl max-h-[90vh] p-4">
+                    <img
+                      src={AD_IMAGE_1}
+                      alt="广告1"
+                      className="max-w-[92vw] max-h-[92vh] object-contain rounded-lg shadow-2xl"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 图片模态框 - 第二个广告 */}
+              {showAd2 && (
+                <div
+                  className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                  onClick={() => setShowAd2(false)}
+                >
+                  <div className="max-w-4xl max-h-[90vh] p-4">
+                    <img
+                      src={AD_IMAGE_2}
+                      alt="广告2"
+                      className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+              )}
+              {showAd3 && (
+                <div
+                  className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                  onClick={() => setShowAd3(false)}
+                >
+                  <div className="max-w-4xl max-h-[90vh] p-4">
+                    <img
+                      src={AD_IMAGE_3}
+                      alt="广告3"
+  
+                      className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* 核心指标展示 */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
