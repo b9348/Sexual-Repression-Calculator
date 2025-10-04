@@ -204,33 +204,6 @@ export function QuestionnaireList({
 
     return () => window.clearTimeout(timer);
   }, [scrollToQuestionId, currentPage]);
-  useEffect(() => {
-    if (!resumeToken) {
-      return;
-    }
-
-    const firstUnanswered = allQuestions.find((question) =>
-      !responses.some((response) => response.questionId === question.id)
-    );
-
-    if (!firstUnanswered) {
-      return;
-    }
-
-    if (usesPagination) {
-      const questionIndex = allQuestions.findIndex((question) => question.id === firstUnanswered.id);
-      if (questionIndex !== -1) {
-        const targetPage = Math.floor(questionIndex / questionsPerPage);
-        if (targetPage !== currentPage) {
-          setCurrentPage(targetPage);
-          setScrollToQuestionId(firstUnanswered.id);
-          return;
-        }
-      }
-    }
-
-    setScrollToQuestionId(firstUnanswered.id);
-  }, [resumeToken, responses, allQuestions, usesPagination, questionsPerPage, currentPage]);
   // 自动保存功能 - 使用debounced保存避免频繁操作
   useEffect(() => {
     if (responses.length > 0) {
@@ -283,6 +256,34 @@ export function QuestionnaireList({
   };
   
   const currentPageQuestions = getCurrentPageQuestions();
+
+  useEffect(() => {
+    if (!resumeToken) {
+      return;
+    }
+
+    const firstUnanswered = allQuestions.find((question) =>
+      !responses.some((response) => response.questionId === question.id)
+    );
+
+    if (!firstUnanswered) {
+      return;
+    }
+
+    if (usesPagination) {
+      const questionIndex = allQuestions.findIndex((question) => question.id === firstUnanswered.id);
+      if (questionIndex !== -1) {
+        const targetPage = Math.floor(questionIndex / questionsPerPage);
+        if (targetPage !== currentPage) {
+          setCurrentPage(targetPage);
+          setScrollToQuestionId(firstUnanswered.id);
+          return;
+        }
+      }
+    }
+
+    setScrollToQuestionId(firstUnanswered.id);
+  }, [resumeToken, responses, allQuestions, usesPagination, questionsPerPage, currentPage]);
 
   // 获取指定题目的回答
   const getResponseForQuestion = (questionId: string) => {
