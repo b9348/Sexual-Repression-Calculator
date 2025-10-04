@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 问卷列表组件 - 以列表形式显示所有问卷题目
  * 提供完整的题目概览和横向选项布局
  */
@@ -182,6 +182,10 @@ export function QuestionnaireList({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [currentPage, type]);
 
   // 自动保存功能 - 使用debounced保存避免频繁操作
   useEffect(() => {

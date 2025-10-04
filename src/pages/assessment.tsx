@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 评估页面 - 问卷系统主界面
  * 负责管理整个评估流程，包括知情同意、人口学信息、量表问卷等
  */
@@ -31,6 +31,10 @@ export default function Assessment() {
   const [demographics, setDemographics] = useState<Demographics | null>(null);
   const [responses, setResponses] = useState<Response[]>([]);
   const [session, setSession] = useState<AssessmentSession | null>(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [currentStep]);
 
   // 初始化会话
   useEffect(() => {
@@ -296,3 +300,4 @@ export default function Assessment() {
     </div>
   );
 }
+
