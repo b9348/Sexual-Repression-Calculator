@@ -8,6 +8,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { AlertTriangle, CheckCircle, ArrowLeft, Home, Brain } from 'lucide-react';
 import { AssessmentSession, Demographics, Response } from '@/types';
 import { calculateAssessmentResults } from '@/lib/calculator';
@@ -31,68 +41,127 @@ export default function Assessment() {
   const [demographics, setDemographics] = useState<Demographics | null>(null);
   const [responses, setResponses] = useState<Response[]>([]);
   const [session, setSession] = useState<AssessmentSession | null>(null);
-  const [progressRestored, setProgressRestored] = useState(false);
+  const [pendingProgress, setPendingProgress] = useState<{
+    demographics?: Demographics;
+    responses: Response[];
+  } | null>(null);
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
+  const [hasCheckedProgress, setHasCheckedProgress] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [currentStep]);
 
   useEffect(() => {
-    if (progressRestored || !session) {
+    if (hasCheckedProgress) {
       return;
     }
 
     const savedProgress = localStorage.getItem('sri_assessment_progress');
     if (!savedProgress) {
-      setProgressRestored(true);
+      setHasCheckedProgress(true);
       return;
     }
 
     try {
       const data = JSON.parse(savedProgress);
       if (data.type !== assessmentType) {
-        setProgressRestored(true);
+        setHasCheckedProgress(true);
         return;
       }
 
       const savedDemographics = data.demographics as Demographics | undefined;
-      const savedResponsesRaw = Array.isArray(data.responses) ? data.responses : [];
-      const restoredResponses: Response[] = savedResponsesRaw.map((item: Response) => ({
-        ...item,
+      type RawResponse = { questionId: string; value: number; timestamp: string };
+      const rawResponses: RawResponse[] = Array.isArray(data.responses) ? data.responses : [];
+      const restoredResponses: Response[] = rawResponses.map((item) => ({
+        questionId: item.questionId,
+        value: item.value,
         timestamp: new Date(item.timestamp),
       }));
 
-      if (savedDemographics) {
-        setDemographics(savedDemographics);
+      if (!savedDemographics && restoredResponses.length === 0) {
+        setHasCheckedProgress(true);
+        return;
       }
 
-      if (restoredResponses.length > 0) {
-        setResponses(restoredResponses);
-
-        const updatedSession: AssessmentSession = {
-          ...session,
-          demographics: savedDemographics || session.demographics,
-          responses: restoredResponses
-        };
-
-        setSession(updatedSession);
-        saveAssessmentSession(updatedSession);
-        setCurrentStep('questionnaire');
-      } else if (savedDemographics) {
-        const updatedSession: AssessmentSession = {
-          ...session,
-          demographics: savedDemographics
-        };
-        setSession(updatedSession);
-        saveAssessmentSession(updatedSession);
-      }
+      setPendingProgress({
+        demographics: savedDemographics,
+        responses: restoredResponses,
+      });
+      setShowProgressDialog(true);
+      setHasCheckedProgress(true);
     } catch (error) {
-      console.error('恢复进度失败:', error);
-    } finally {
-      setProgressRestored(true);
+      console.error('检查保存的进度时出错:', error);
+      setHasCheckedProgress(true);
     }
-  }, [assessmentType, session, progressRestored]);
+  }, [assessmentType, hasCheckedProgress]);
 
+  const handleContinueProgress = () => {
+    if (!pendingProgress) {
+      setShowProgressDialog(false);
+      return;
+    }
+
+    const baseSession: AssessmentSession = session ?? {
+      id: sessionId,
+      type: assessmentType,
+      demographics: pendingProgress.demographics ?? ({} as Demographics),
+      responses: [],
+      startTime: new Date(),
+      completed: false,
+    };
+
+    if (pendingProgress.demographics) {
+      setDemographics(pendingProgress.demographics);
+    }
+
+    setResponses(pendingProgress.responses);
+
+    const updatedSession: AssessmentSession = {
+      ...baseSession,
+      demographics: pendingProgress.demographics ?? baseSession.demographics,
+      responses: pendingProgress.responses,
+      completed: false,
+      endTime: undefined,
+    };
+
+    setSession(updatedSession);
+    saveAssessmentSession(updatedSession);
+
+    setCurrentStep('questionnaire');
+    setPendingProgress(null);
+    setShowProgressDialog(false);
+    setHasCheckedProgress(true);
+  };
+
+  const handleDiscardProgress = () => {
+    localStorage.removeItem('sri_assessment_progress');
+    setPendingProgress(null);
+    setShowProgressDialog(false);
+    setHasCheckedProgress(true);
+    setDemographics(null);
+    setResponses([]);
+    setCurrentStep('consent');
+
+    if (session) {
+      setSession({
+        ...session,
+        demographics: {} as Demographics,
+        responses: [],
+        startTime: new Date(),
+        completed: false,
+        endTime: undefined,
+      });
+    }
+  };
+
+  const handleProgressDialogOpenChange = (open: boolean) => {
+    if (!open && pendingProgress) {
+      setShowProgressDialog(true);
+      return;
+    }
+    setShowProgressDialog(open);
+  };
   // 初始化会话
 
   useEffect(() => {
@@ -210,6 +279,24 @@ export default function Assessment() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
+      <AlertDialog open={showProgressDialog} onOpenChange={handleProgressDialogOpenChange}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>检测到未完成的评估</AlertDialogTitle>
+            <AlertDialogDescription>
+              检测到本地保存的未完成评估，已回答 {pendingProgress?.responses.length ?? 0} 道题。请选择继续作答或重新开始。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDiscardProgress}>
+              重新开始
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleContinueProgress}>
+              继续作答
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {/* 顶部导航 */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-muted">
         <div className="container mx-auto px-4 py-4">
@@ -358,5 +445,3 @@ export default function Assessment() {
     </div>
   );
 }
-
-
