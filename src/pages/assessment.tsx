@@ -3,7 +3,7 @@
  * 负责管理整个评估流程，包括知情同意、人口学信息、量表问卷等
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,7 @@ export default function Assessment() {
   } | null>(null);
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const [hasCheckedProgress, setHasCheckedProgress] = useState(false);
+  const closingProgressDialogRef = useRef(false);
   const [resumeToken, setResumeToken] = useState<number | null>(null);
 
   useEffect(() => {
@@ -90,6 +91,7 @@ export default function Assessment() {
         responses: restoredResponses,
       });
       setShowProgressDialog(true);
+      closingProgressDialogRef.current = false;
       setHasCheckedProgress(true);
     } catch (error) {
       console.error('检查保存的进度时出错:', error);
@@ -99,9 +101,12 @@ export default function Assessment() {
 
   const handleContinueProgress = () => {
     if (!pendingProgress) {
+      closingProgressDialogRef.current = false;
       setShowProgressDialog(false);
       return;
     }
+
+    closingProgressDialogRef.current = true;
 
     const baseSession: AssessmentSession = session ?? {
       id: sessionId,
@@ -129,7 +134,7 @@ export default function Assessment() {
     setSession(updatedSession);
     saveAssessmentSession(updatedSession);
 
-    setCurrentStep('questionnaire');
+    setCurrentStep("questionnaire");
     setPendingProgress(null);
     setShowProgressDialog(false);
     setResumeToken(Date.now());
@@ -137,13 +142,14 @@ export default function Assessment() {
   };
 
   const handleDiscardProgress = () => {
-    localStorage.removeItem('sri_assessment_progress');
+    closingProgressDialogRef.current = true;
+    localStorage.removeItem("sri_assessment_progress");
     setPendingProgress(null);
     setShowProgressDialog(false);
     setHasCheckedProgress(true);
     setDemographics(null);
     setResponses([]);
-    setCurrentStep('consent');
+    setCurrentStep("consent");
     setResumeToken(null);
 
     if (session) {
@@ -159,10 +165,19 @@ export default function Assessment() {
   };
 
   const handleProgressDialogOpenChange = (open: boolean) => {
-    if (!open && pendingProgress) {
-      setShowProgressDialog(true);
-      return;
+    if (!open) {
+      if (closingProgressDialogRef.current) {
+        closingProgressDialogRef.current = false;
+        setShowProgressDialog(false);
+        return;
+      }
+
+      if (pendingProgress) {
+        setShowProgressDialog(true);
+        return;
+      }
     }
+
     setShowProgressDialog(open);
   };
   // 初始化会话
@@ -449,3 +464,6 @@ export default function Assessment() {
     </div>
   );
 }
+
+
+
