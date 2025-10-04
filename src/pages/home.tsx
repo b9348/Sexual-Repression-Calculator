@@ -25,9 +25,9 @@ import {
   History
 } from 'lucide-react';
 
-const AD_IMAGE_1 = 'https://img.vercel.bio/file/1759552830850_1.jpg';
-const AD_IMAGE_2 = 'https://img.vercel.bio/file/1759552534653_Screenshot_2025_1004_123439.png';
-const AD_IMAGE_3 = 'https://img.vercel.bio/file/1759551964622_Screenshot_2025_1004_122409.png';
+const AD_IMAGE_1 = 'https://free.picui.cn/free/2025/10/04/68e0aaf4099ea.jpg';
+const AD_IMAGE_2 = 'https://free.picui.cn/free/2025/10/04/68e0aaf452e5d.png';
+const AD_IMAGE_3 = 'https://free.picui.cn/free/2025/10/04/68e0aaf50ff2e.png';
 
 export default function Home() {
   const [showAd1, setShowAd1] = useState(false);
@@ -77,22 +77,22 @@ export default function Home() {
             </div>
             
             <div className="flex items-center gap-1 sm:gap-4">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/guide" className="flex items-center">
-                  <BookOpen className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">使用指南</span>
+              <Button variant="ghost" size="sm" asChild className="h-auto py-1.5">
+                <Link to="/guide" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  <span className="text-[10px] sm:text-sm">使用指南</span>
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/science" className="flex items-center">
-                  <FileText className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">科学依据</span>
+              <Button variant="ghost" size="sm" asChild className="h-auto py-1.5">
+                <Link to="/science" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2">
+                  <FileText className="w-4 h-4" />
+                  <span className="text-[10px] sm:text-sm">科学依据</span>
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/history" className="flex items-center">
-                  <History className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">历史记录</span>
+              <Button variant="ghost" size="sm" asChild className="h-auto py-1.5">
+                <Link to="/history" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2">
+                  <History className="w-4 h-4" />
+                  <span className="text-[10px] sm:text-sm">历史记录</span>
                 </Link>
               </Button>
             </div>
@@ -165,14 +165,14 @@ export default function Home() {
                   className="border-blue-500 text-blue-600 hover:bg-blue-50"
                   onClick={() => setShowAd2(!showAd2)}
                 >
-                  [广告]第二家
+                  第二家
                 </Button>
                 <Button
                   variant="outline"
                   className="border-green-500 text-green-600 hover:bg-green-50"
                   onClick={() => setShowAd3(!showAd3)}
                 >
-                  [广告]第三家
+                  第三家
                 </Button>
               </div>
 

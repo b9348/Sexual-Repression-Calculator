@@ -304,7 +304,7 @@ export function calculateSRI(dimensionScores: DimensionScores): SRIResult {
   // 确定SRI等级
   let level: keyof typeof SRI_LEVELS = 'moderate';
   for (const [levelKey, levelData] of Object.entries(SRI_LEVELS)) {
-    if (totalScore >= levelData.min && totalScore < levelData.max) {
+    if (totalScore >= levelData.min && totalScore <= levelData.max) {
       level = levelKey as keyof typeof SRI_LEVELS;
       break;
     }
