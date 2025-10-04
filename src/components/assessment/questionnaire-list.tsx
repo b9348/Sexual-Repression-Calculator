@@ -10,11 +10,18 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, AlertCircle, ArrowLeft, ArrowRight, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+} from '@/components/ui/dialog';
+import { CheckCircle, AlertCircle, ArrowLeft, ArrowRight, BarChart3, ChevronLeft, ChevronRight, ArrowUp } from 'lucide-react';
 import { Question, Response, Demographics } from '@/types';
-import { 
-  ALL_SCALES, 
-  QUICK_ASSESSMENT_SCALES, 
+import {
+  ALL_SCALES,
+  QUICK_ASSESSMENT_SCALES,
   FULL_ASSESSMENT_SCALES,
   getAdaptiveScales,
   getAdaptiveFullScales,
@@ -30,6 +37,107 @@ interface QuestionnaireListProps {
   onResponseUpdate: (responses: Response[]) => void;
   onComplete: () => void;
   onBack?: () => void;
+}
+
+// 分页导航组件 - 统一的翻页组件，支持快捷翻页
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+function PaginationNav({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  const canGoPrev = currentPage > 0;
+  const canGoNext = currentPage < totalPages - 1;
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const goToPrev = () => {
+    if (canGoPrev) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (canGoNext) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
+  // 当前页变化时，自动滚动到可视区域
+  React.useEffect(() => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const activeButton = container.querySelector(`[data-page="${currentPage}"]`) as HTMLElement;
+
+      if (activeButton) {
+        // 计算按钮相对于容器的位置
+        const containerWidth = container.clientWidth;
+        const buttonLeft = activeButton.offsetLeft;
+        const buttonWidth = activeButton.offsetWidth;
+
+        // 滚动到按钮居中位置
+        container.scrollTo({
+          left: buttonLeft - containerWidth / 2 + buttonWidth / 2,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [currentPage]);
+
+  return (
+    <div className="flex items-center justify-between gap-2 sm:gap-4">
+      <Button
+        variant="outline"
+        onClick={goToPrev}
+        disabled={!canGoPrev}
+        className="flex items-center gap-1 sm:gap-2 transition-all hover:scale-105 disabled:hover:scale-100 shrink-0 h-9 px-2 sm:px-4"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        <span className="hidden sm:inline text-sm">上一页</span>
+      </Button>
+
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <span className="text-xs sm:text-sm text-muted-foreground shrink-0 hidden md:inline">
+          {currentPage + 1} / {totalPages}
+        </span>
+        {/* 快捷翻页按钮 - 横向滚动容器 */}
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-1 overflow-x-auto overflow-y-hidden flex-1 py-1"
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              data-page={i}
+              onClick={() => onPageChange(i)}
+              className={`
+                w-8 h-8 rounded text-xs font-medium transition-all duration-200 shrink-0
+                ${i === currentPage
+                  ? 'bg-psychology-primary text-white scale-110 shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105'
+                }
+              `}
+              aria-label={`第 ${i + 1} 页`}
+              aria-current={i === currentPage ? 'page' : undefined}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        onClick={goToNext}
+        disabled={!canGoNext}
+        className="flex items-center gap-1 sm:gap-2 transition-all hover:scale-105 disabled:hover:scale-100 shrink-0 h-9 px-2 sm:px-4"
+      >
+        <span className="hidden sm:inline text-sm">下一页</span>
+        <ChevronRight className="w-4 h-4" />
+      </Button>
+    </div>
+  );
 }
 
 export function QuestionnaireList({
@@ -62,6 +170,18 @@ export function QuestionnaireList({
   const [scrollToQuestionId, setScrollToQuestionId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+
+  // 监听滚动，显示/隐藏回到顶部按钮
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // 自动保存功能 - 使用debounced保存避免频繁操作
   useEffect(() => {
@@ -206,25 +326,36 @@ export function QuestionnaireList({
   }, {} as Record<string, Question[]>);
 
   // 分页导航函数
-  const goToNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-      window.scrollTo(0, 0);
-    }
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    // 只在顶部导航栏切换时才自动滚动到顶部
+    // 底部切换时不滚动，让用户自己决定
   };
 
-  const goToPrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-      window.scrollTo(0, 0);
-    }
+  // 回到顶部
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
-
-  const canGoNext = currentPage < totalPages - 1;
-  const canGoPrev = currentPage > 0;
 
   const stats = getAnswerStats();
   const progress = (stats.answered / allQuestions.length) * 100;
+
+  // 返回上一步 - 二次确认
+  const handleBack = () => {
+    if (responses.length > 0) {
+      setShowBackConfirm(true);
+    } else {
+      onBack?.();
+    }
+  };
+
+  const confirmBack = () => {
+    setShowBackConfirm(false);
+    onBack?.();
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -282,53 +413,15 @@ export function QuestionnaireList({
       {usesPagination && (
         <Card className="sri-card">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                onClick={goToPrevPage}
-                disabled={!canGoPrev}
-                className="flex items-center gap-2"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                上一页
-              </Button>
-
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">
-                  第 {currentPage + 1} 页，共 {totalPages} 页
-                </span>
-                <div className="flex gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setCurrentPage(i);
-                        window.scrollTo(0, 0);
-                      }}
-                      className={`
-                        w-8 h-8 rounded text-xs font-medium transition-colors
-                        ${i === currentPage 
-                          ? 'bg-psychology-primary text-white' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }
-                      `}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={goToNextPage}
-                disabled={!canGoNext}
-                className="flex items-center gap-2"
-              >
-                下一页
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
+            <PaginationNav
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                handlePageChange(page);
+                // 顶部导航时自动滚动到顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
           </CardContent>
         </Card>
       )}
@@ -471,52 +564,112 @@ export function QuestionnaireList({
       {/* 底部操作区域 */}
       <Card className="sri-card">
         <CardContent className="p-6">
-          <div className="flex justify-between items-center">
-            <Button 
-              variant="outline"
-              onClick={onBack}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              返回上一步
-            </Button>
+          <div className="space-y-4">
+            {/* 分页导航 - 底部也使用相同组件，支持快捷翻页 */}
+            {usesPagination && (
+              <div className="pb-4 border-b">
+                <PaginationNav
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
 
-            <div className="text-center">
-              {usesPagination && stats.requiredUnanswered > 0 && (
-                <p className="text-sm text-amber-600 mb-2">
-                  还有未完成的题目，请继续填写或查看其他页面
-                </p>
-              )}
-              {!usesPagination && (
-                <p className="text-sm text-muted-foreground mb-2">
-                  请确保所有必答题都已完成
-                </p>
-              )}
-              <Button 
-                onClick={handleComplete}
-                disabled={stats.requiredUnanswered > 0}
-                className="bg-psychology-primary hover:bg-psychology-primary/90 px-8"
-                size="lg"
+            {/* 主要操作按钮 */}
+            <div className="flex justify-between items-center flex-wrap gap-4">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="flex items-center gap-2 transition-all hover:scale-105"
               >
-                完成评估并查看结果
-                <CheckCircle className="w-4 h-4 ml-2" />
+                <ArrowLeft className="w-4 h-4" />
+                返回上一步
               </Button>
-            </div>
 
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">
-                进度: {Math.round(progress)}%
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {stats.requiredUnanswered > 0 
-                  ? `还有 ${stats.requiredUnanswered} 道必答题`
-                  : '所有必答题已完成'
-                }
-              </p>
+              <div className="text-center flex-1">
+                {usesPagination && stats.requiredUnanswered > 0 && (
+                  <p className="text-sm text-amber-600 mb-2">
+                    还有未完成的题目，请继续填写或查看其他页面
+                  </p>
+                )}
+                {!usesPagination && (
+                  <p className="text-sm text-muted-foreground mb-2">
+                    请确保所有必答题都已完成
+                  </p>
+                )}
+                <Button
+                  onClick={handleComplete}
+                  disabled={stats.requiredUnanswered > 0}
+                  className="bg-psychology-primary hover:bg-psychology-primary/90 px-8 transition-all hover:scale-105"
+                  size="lg"
+                >
+                  完成评估并查看结果
+                  <CheckCircle className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">
+                  进度: {Math.round(progress)}%
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {stats.requiredUnanswered > 0
+                    ? `还有 ${stats.requiredUnanswered} 道必答题`
+                    : '所有必答题已完成'
+                  }
+                </p>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* 回到顶部悬浮按钮 */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="
+            fixed bottom-6 right-6 z-50
+            w-12 h-12 rounded-full
+            bg-psychology-primary text-white
+            shadow-lg hover:shadow-xl
+            flex items-center justify-center
+            transition-all duration-300 ease-out
+            hover:scale-110 active:scale-95
+            animate-in fade-in slide-in-from-bottom-4
+          "
+          aria-label="回到顶部"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* 返回确认对话框 */}
+      <Dialog open={showBackConfirm} onOpenChange={setShowBackConfirm}>
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-sm">
+          <DialogHeader>
+            <DialogDescription className="text-center text-base pt-4">
+              您确定要离开答题区域吗？
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowBackConfirm(false)}
+              className="transition-all hover:scale-105"
+            >
+              取消
+            </Button>
+            <Button
+              onClick={confirmBack}
+              className="bg-psychology-primary hover:bg-psychology-primary/90 transition-all hover:scale-105"
+            >
+              确认
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 底部说明 */}
       <div className="text-center py-4">
