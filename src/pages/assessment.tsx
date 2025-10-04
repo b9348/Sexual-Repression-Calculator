@@ -55,6 +55,8 @@ export default function Assessment() {
       return;
     }
     setCurrentStep('demographics');
+    // 滚动到顶部以显示完整的人口学信息表单
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // 处理人口学信息提交
@@ -69,6 +71,8 @@ export default function Assessment() {
       saveAssessmentSession(updatedSession);
     }
     setCurrentStep('questionnaire');
+    // 滚动到顶部以显示问卷开始部分
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // 处理问卷回答更新
@@ -136,7 +140,10 @@ export default function Assessment() {
         break;
       default:
         navigate('/');
+        return;
     }
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
