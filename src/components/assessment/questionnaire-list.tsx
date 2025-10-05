@@ -3,30 +3,19 @@
  * 提供完整的题目概览和横向选项布局
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-} from '@/components/ui/dialog';
-import { CheckCircle, AlertCircle, ArrowLeft, ArrowRight, BarChart3, ChevronLeft, ChevronRight, ArrowUp } from 'lucide-react';
+import { CheckCircle, AlertCircle, BarChart3, ChevronLeft, ChevronRight, ArrowUp } from 'lucide-react';
 import { Question, Response, Demographics } from '@/types';
 import {
   ALL_SCALES,
-  QUICK_ASSESSMENT_SCALES,
-  FULL_ASSESSMENT_SCALES,
   getAdaptiveScales,
   getAdaptiveFullScales,
-  isMinor,
-  isInexperienced,
   getUserGroupDescription
 } from '@/lib/scales';
 
@@ -45,22 +34,60 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  position?: 'top' | 'bottom'; // 新增: 标识导航栏位置
 }
 
-function PaginationNav({ currentPage, totalPages, onPageChange }: PaginationProps) {
+function PaginationNav({ currentPage, totalPages, onPageChange, position = 'top' }: PaginationProps) {
   const canGoPrev = currentPage > 0;
   const canGoNext = currentPage < totalPages - 1;
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   const goToPrev = () => {
     if (canGoPrev) {
-      onPageChange(currentPage - 1);
+      handlePageChangeWithScroll(() => onPageChange(currentPage - 1));
     }
   };
 
   const goToNext = () => {
     if (canGoNext) {
-      onPageChange(currentPage + 1);
+      handlePageChangeWithScroll(() => onPageChange(currentPage + 1));
+    }
+  };
+
+  // 处理页面切换和滚动行为
+  const handlePageChangeWithScroll = (changePageFn: () => void) => {
+    if (position === 'bottom') {
+      // 底部导航: 使用 will-change 优化和立即滚动
+
+      // 先执行页面切换
+      changePageFn();
+
+      // 立即同步滚动到底部(不等待下一帧)
+      // 使用 setTimeout 0 确保在 React 状态更新后立即执行
+      setTimeout(() => {
+        const maxScroll = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight,
+          document.body.clientHeight,
+          document.documentElement.clientHeight
+        ) - window.innerHeight;
+
+        // 直接设置 scrollTop,最快的方式
+        document.documentElement.scrollTop = maxScroll;
+        document.body.scrollTop = maxScroll; // 兼容性
+      }, 0);
+    } else {
+      // 顶部导航: 保存并恢复滚动位置
+      const scrollY = window.scrollY;
+
+      // 执行页面切换
+      changePageFn();
+
+      // 立即恢复滚动位置(同步)
+      document.documentElement.scrollTop = scrollY;
+      document.body.scrollTop = scrollY; // 兼容性
     }
   };
 
@@ -111,101 +138,9 @@ function PaginationNav({ currentPage, totalPages, onPageChange }: PaginationProp
             <button
               key={i}
               data-page={i}
-              onClick={() => onPageChange(i)}
-              className={`
-                w-8 h-8 rounded text-xs font-medium transition-all duration-200 shrink-0
-                ${i === currentPage
-                  ? 'bg-psychology-primary text-white scale-110 shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105'
-                }
-              `}
-              aria-label={`第 ${i + 1} 页`}
-              aria-current={i === currentPage ? 'page' : undefined}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <Button
-        variant="outline"
-        onClick={goToNext}
-        disabled={!canGoNext}
-        className="flex items-center gap-1 sm:gap-2 transition-all hover:scale-105 disabled:hover:scale-100 shrink-0 h-9 px-2 sm:px-4"
-      >
-        <span className="hidden sm:inline text-sm">下一页</span>
-        <ChevronRight className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-}
-
-function PaginationNav({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  const canGoPrev = currentPage > 0;
-  const canGoNext = currentPage < totalPages - 1;
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-
-  const goToPrev = () => {
-    if (canGoPrev) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const goToNext = () => {
-    if (canGoNext) {
-      onPageChange(currentPage + 1);
-    }
-  };
-
-  // 当前页变化时，自动滚动到可视区域
-  React.useEffect(() => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const activeButton = container.querySelector(`[data-page="${currentPage}"]`) as HTMLElement;
-
-      if (activeButton) {
-        // 计算按钮相对于容器的位置
-        const containerWidth = container.clientWidth;
-        const buttonLeft = activeButton.offsetLeft;
-        const buttonWidth = activeButton.offsetWidth;
-
-        // 滚动到按钮居中位置
-        container.scrollTo({
-          left: buttonLeft - containerWidth / 2 + buttonWidth / 2,
-          behavior: 'smooth'
-        });
-      }
-    }
-  }, [currentPage]);
-
-  return (
-    <div className="flex items-center justify-between gap-2 sm:gap-4">
-      <Button
-        variant="outline"
-        onClick={goToPrev}
-        disabled={!canGoPrev}
-        className="flex items-center gap-1 sm:gap-2 transition-all hover:scale-105 disabled:hover:scale-100 shrink-0 h-9 px-2 sm:px-4"
-      >
-        <ChevronLeft className="w-4 h-4" />
-        <span className="hidden sm:inline text-sm">上一页</span>
-      </Button>
-
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        <span className="text-xs sm:text-sm text-muted-foreground shrink-0 hidden md:inline">
-          {currentPage + 1} / {totalPages}
-        </span>
-        {/* 快捷翻页按钮 - 横向滚动容器 */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-1 overflow-x-auto overflow-y-hidden flex-1 py-1"
-          style={{ scrollbarWidth: 'thin' }}
-        >
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              data-page={i}
-              onClick={() => onPageChange(i)}
+              onClick={() => {
+                handlePageChangeWithScroll(() => onPageChange(i));
+              }}
               className={`
                 w-8 h-8 rounded text-xs font-medium transition-all duration-200 shrink-0
                 ${i === currentPage
@@ -244,30 +179,35 @@ export function QuestionnaireList({
   onBack,
   resumeToken
 }: QuestionnaireListProps) {
-  // 根据用户特征选择适应性量表
-  const getScalesForUser = () => {
+  //  性能优化1: Memoize scaleIds - 只在关键字段变化时重新计算
+  const scaleIds = useMemo(() => {
     if (type === 'quick') {
       return getAdaptiveScales(demographics);
     } else {
       return getAdaptiveFullScales(demographics);
     }
-  };
+  }, [type, demographics.age, demographics.sexualActivity]);
 
-  const scaleIds = getScalesForUser();
-  const userGroup = getUserGroupDescription(demographics);
-  
+  //  性能优化2: Memoize userGroup
+  const userGroup = useMemo(() => {
+    return getUserGroupDescription(demographics);
+  }, [demographics.age, demographics.sexualActivity]);
+
   // 显示选中的量表信息
-  console.log(`用户群体: ${userGroup}, 选中量表:`, scaleIds);
-  const allQuestions = scaleIds.flatMap(scaleId => {
-    const scale = ALL_SCALES[scaleId];
-    return scale ? scale.questions : [];
-  });
+  // console.log(`用户群体: ${userGroup}, 选中量表:`, scaleIds);
+
+  //  性能优化3: Memoize allQuestions - 避免每次渲染都flatMap
+  const allQuestions = useMemo(() => {
+    return scaleIds.flatMap(scaleId => {
+      const scale = ALL_SCALES[scaleId];
+      return scale ? scale.questions : [];
+    });
+  }, [scaleIds]);
 
   const [scrollToQuestionId, setScrollToQuestionId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [showBackConfirm, setShowBackConfirm] = useState(false);
 
   // 监听滚动，显示/隐藏回到顶部按钮
   useEffect(() => {
@@ -322,15 +262,13 @@ export function QuestionnaireList({
   const usesPagination = type === 'full';
   const questionsPerPage = usesPagination ? 15 : allQuestions.length;
   const totalPages = usesPagination ? Math.ceil(allQuestions.length / questionsPerPage) : 1;
-  
-  // 获取当前页的题目
-  const getCurrentPageQuestions = () => {
+
+  //  性能优化4: Memoize currentPageQuestions
+  const currentPageQuestions = useMemo(() => {
     if (!usesPagination) return allQuestions;
     const startIndex = currentPage * questionsPerPage;
     return allQuestions.slice(startIndex, startIndex + questionsPerPage);
-  };
-  
-  const currentPageQuestions = getCurrentPageQuestions();
+  }, [usesPagination, allQuestions, currentPage, questionsPerPage]);
   useEffect(() => {
     if (!scrollToQuestionId) {
       return;
@@ -381,13 +319,18 @@ export function QuestionnaireList({
     setScrollToQuestionId(firstUnanswered.id);
   }, [resumeToken, responses, allQuestions, usesPagination, questionsPerPage, currentPage]);
 
-  // 获取指定题目的回答
-  const getResponseForQuestion = (questionId: string) => {
-    return responses.find(r => r.questionId === questionId);
-  };
+  //  性能优化5: 创建responses的Map以加速查找 (O(1) vs O(n))
+  const responsesMap = useMemo(() => {
+    return new Map(responses.map(r => [r.questionId, r]));
+  }, [responses]);
 
-  // 处理回答
-  const handleAnswer = (questionId: string, value: number) => {
+  //  性能优化6: 使用useCallback包装函数，避免子组件不必要的重渲染
+  const getResponseForQuestion = useCallback((questionId: string) => {
+    return responsesMap.get(questionId);
+  }, [responsesMap]);
+
+  //  性能优化7: 使用useCallback包装handleAnswer
+  const handleAnswer = useCallback((questionId: string, value: number) => {
     const response: Response = {
       questionId,
       value,
@@ -397,27 +340,28 @@ export function QuestionnaireList({
     const updatedResponses = responses.filter(r => r.questionId !== questionId);
     updatedResponses.push(response);
     onResponseUpdate(updatedResponses);
-  };
+  }, [responses, onResponseUpdate]);
 
-  // 获取回答统计
-  const getAnswerStats = () => {
+  //  性能优化8: Memoize统计数据，避免每次渲染都重新计算
+  const stats = useMemo(() => {
     const answered = responses.length;
     const unanswered = allQuestions.length - answered;
     const requiredUnanswered = allQuestions
-      .filter(q => q.required)
-      .filter(q => !responses.some(r => r.questionId === q.id))
+      .filter(q => q.required && !responsesMap.has(q.id))
       .length;
-    
-    return { answered, unanswered, requiredUnanswered };
-  };
 
-  // 完成评估
-  const handleComplete = () => {
-    const stats = getAnswerStats();
+    return { answered, unanswered, requiredUnanswered };
+  }, [responses.length, allQuestions, responsesMap]);
+
+  // 计算当前页面的答题进度 - 需要在 questionsByScale 之后计算
+  // 暂时使用 currentPageQuestions,稍后会更新
+
+  //  性能优化9: 使用useCallback包装handleComplete
+  const handleComplete = useCallback(() => {
     if (stats.requiredUnanswered > 0) {
       // 滚动到第一个未回答的必答题
-      const firstUnanswered = allQuestions.find(q => 
-        q.required && !responses.some(r => r.questionId === q.id)
+      const firstUnanswered = allQuestions.find(q =>
+        q.required && !responsesMap.has(q.id)
       );
       if (firstUnanswered) {
         // 如果是分页模式，先跳转到对应页面
@@ -435,72 +379,82 @@ export function QuestionnaireList({
             return;
           }
         }
-        
+
         document.getElementById(`question-${firstUnanswered.id}`)?.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
       }
-      
+
       alert(`还有 ${stats.requiredUnanswered} 道必答题未完成，请继续填写。`);
       return;
     }
-    
+
     // 清除保存的进度
     localStorage.removeItem('sri_assessment_progress');
     onComplete();
-  };
+  }, [stats, allQuestions, responsesMap, usesPagination, questionsPerPage, currentPage, onComplete]);
 
-  // 按量表分组题目 - 根据分页模式调整
-  const questionsByScale = scaleIds.reduce((acc, scaleId) => {
-    const scale = ALL_SCALES[scaleId];
-    if (scale) {
-      if (usesPagination) {
-        // 分页模式：只显示当前页的题目
-        const scaleQuestionsOnPage = scale.questions.filter(q => 
-          currentPageQuestions.some(pq => pq.id === q.id)
-        );
-        if (scaleQuestionsOnPage.length > 0) {
-          acc[scaleId] = scaleQuestionsOnPage;
+  //  性能优化10: Memoize questionsByScale，避免每次渲染都reduce
+  const questionsByScale = useMemo(() => {
+    // 创建当前页题目ID的Set以加速查找
+    const currentPageSet = new Set(currentPageQuestions.map(q => q.id));
+
+    return scaleIds.reduce((acc, scaleId) => {
+      const scale = ALL_SCALES[scaleId];
+      if (scale) {
+        if (usesPagination) {
+          // 分页模式：只显示当前页的题目，使用Set加速查找
+          const scaleQuestionsOnPage = scale.questions.filter(q =>
+            currentPageSet.has(q.id)
+          );
+          if (scaleQuestionsOnPage.length > 0) {
+            acc[scaleId] = scaleQuestionsOnPage;
+          }
+        } else {
+          acc[scaleId] = scale.questions;
         }
-      } else {
-        acc[scaleId] = scale.questions;
       }
-    }
-    return acc;
-  }, {} as Record<string, Question[]>);
+      return acc;
+    }, {} as Record<string, Question[]>);
+  }, [scaleIds, usesPagination, currentPageQuestions]);
+
+  // 计算当前页面的答题进度 - 基于 questionsByScale
+  const currentPageStats = useMemo(() => {
+    // 获取当前页面所有题目
+    const pageQuestions = Object.values(questionsByScale).flat();
+    const pageAnswered = pageQuestions.filter(q => responsesMap.has(q.id)).length;
+    const pageTotal = pageQuestions.length;
+    const pageProgress = pageTotal > 0 ? (pageAnswered / pageTotal) * 100 : 0;
+
+    return {
+      answered: pageAnswered,
+      total: pageTotal,
+      progress: pageProgress
+    };
+  }, [questionsByScale, responsesMap]);
 
   // 分页导航函数
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage);
     // 只在顶部导航栏切换时才自动滚动到顶部
     // 底部切换时不滚动，让用户自己决定
-  };
+  }, []);
 
   // 回到顶部
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-  };
+  }, []);
 
-  const stats = getAnswerStats();
-  const progress = (stats.answered / allQuestions.length) * 100;
+  //  性能优化11: Memoize progress计算
+  const progress = useMemo(() => {
+    return (stats.answered / allQuestions.length) * 100;
+  }, [stats.answered, allQuestions.length]);
 
-  // 返回上一步 - 二次确认
-  const handleBack = () => {
-    if (responses.length > 0) {
-      setShowBackConfirm(true);
-    } else {
-      onBack?.();
-    }
-  };
 
-  const confirmBack = () => {
-    setShowBackConfirm(false);
-    onBack?.();
-  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -523,7 +477,8 @@ export function QuestionnaireList({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-psychology-primary border-psychology-primary">
+              <div className='flex flex-col items-center gap-2'>
+                <Badge variant="outline" className="text-psychology-primary border-psychology-primary">
                 {stats.answered} / {allQuestions.length} 已完成
               </Badge>
               {lastSaved && (
@@ -531,6 +486,7 @@ export function QuestionnaireList({
                   已保存 {lastSaved.toLocaleTimeString()}
                 </Badge>
               )}
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -561,11 +517,8 @@ export function QuestionnaireList({
             <PaginationNav
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={(page) => {
-                handlePageChange(page);
-                // 顶部导航时自动滚动到顶部
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onPageChange={handlePageChange}
+              position="top"
             />
           </CardContent>
         </Card>
@@ -717,21 +670,26 @@ export function QuestionnaireList({
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
+                  position="bottom"
+                />
+              </div>
+            )}
+
+            {/* 当前页面答题进度 */}
+            {usesPagination && (
+              <div className="flex items-center justify-center gap-2 pb-4 border-b flex-col">
+                <Badge variant="secondary" className="text-sm">
+                  {currentPageStats.answered} / {currentPageStats.total}
+                </Badge>
+                <Progress
+                  value={currentPageStats.progress}
+                  className="h-1 w-24"
                 />
               </div>
             )}
 
             {/* 主要操作按钮 */}
-            <div className="flex justify-between items-center flex-wrap gap-4">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="flex items-center gap-2 transition-all hover:scale-105"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                返回上一步
-              </Button>
-
+            <div className="flex justify-center items-center flex-wrap gap-4 flex-col">
               <div className="text-center flex-1">
                 {usesPagination && stats.requiredUnanswered > 0 && (
                   <p className="text-sm text-amber-600 mb-2">
@@ -755,7 +713,7 @@ export function QuestionnaireList({
               </div>
 
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground text-center">
                   进度: {Math.round(progress)}%
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -789,32 +747,6 @@ export function QuestionnaireList({
           <ArrowUp className="w-5 h-5" />
         </button>
       )}
-
-      {/* 返回确认对话框 */}
-      <Dialog open={showBackConfirm} onOpenChange={setShowBackConfirm}>
-        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-sm">
-          <DialogHeader>
-            <DialogDescription className="text-center text-base pt-4">
-              您确定要离开答题区域吗？
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="sm:justify-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowBackConfirm(false)}
-              className="transition-all hover:scale-105"
-            >
-              取消
-            </Button>
-            <Button
-              onClick={confirmBack}
-              className="bg-psychology-primary hover:bg-psychology-primary/90 transition-all hover:scale-105"
-            >
-              确认
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* 底部说明 */}
       <div className="text-center py-4">

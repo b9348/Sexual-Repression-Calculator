@@ -3,7 +3,7 @@
  * 负责管理整个评估流程，包括知情同意、人口学信息、量表问卷等
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ import { saveAssessmentSession } from '@/lib/storage';
 import { ConsentForm } from '@/components/assessment/consent-form';
 import { DemographicsForm } from '@/components/assessment/demographics-form';
 import { QuestionnaireSection } from '@/components/assessment/questionnaire-section';
+import { getAdaptiveScales, getAdaptiveFullScales, ALL_SCALES } from '@/lib/scales';
 
 type AssessmentStep = 'consent' | 'demographics' | 'questionnaire' | 'processing' | 'completed';
 
@@ -49,6 +50,47 @@ export default function Assessment() {
   const [hasCheckedProgress, setHasCheckedProgress] = useState(false);
   const closingProgressDialogRef = useRef(false);
   const [resumeToken, setResumeToken] = useState<number | null>(null);
+  const [showDataChangeWarning, setShowDataChangeWarning] = useState(false);
+  const [dataChangeInfo, setDataChangeInfo] = useState<{ discardedCount: number; totalCount: number } | null>(null);
+
+  // 🔧 统一的数据清理函数 - 彻底清除所有孤儿数据
+  const cleanupOrphanData = useCallback((cleanedResponses: Response[], cleanedDemographics?: Demographics) => {
+    try {
+      // 清理localStorage中的进度数据
+      if (cleanedResponses.length === 0) {
+        // 如果没有任何回答，直接删除进度
+        localStorage.removeItem('sri_assessment_progress');
+        console.log('已删除空的进度数据');
+      } else {
+        // 如果有回答，更新为清理后的数据
+        const cleanedProgressData = {
+          type: assessmentType,
+          demographics: cleanedDemographics || demographics,
+          responses: cleanedResponses,
+          currentPage: 0,
+          timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('sri_assessment_progress', JSON.stringify(cleanedProgressData));
+        console.log(`已清理进度数据，保留${cleanedResponses.length}个有效回答`);
+      }
+
+      // 清理session数据
+      if (session) {
+        const cleanedSession: AssessmentSession = {
+          ...session,
+          demographics: cleanedDemographics || session.demographics,
+          responses: cleanedResponses,
+          completed: false,
+          endTime: undefined,
+        };
+        setSession(cleanedSession);
+        saveAssessmentSession(cleanedSession);
+        console.log('已更新session数据');
+      }
+    } catch (error) {
+      console.error('清理孤儿数据失败:', error);
+    }
+  }, [assessmentType, demographics, session]);
 
   useEffect(() => {
     if (hasCheckedProgress) {
@@ -113,22 +155,63 @@ export default function Assessment() {
       completed: false,
     };
 
+    // 🔧 Bug修复: 检测demographics变化并过滤无效回答
+    let finalResponses = pendingProgress.responses;
+
     if (pendingProgress.demographics) {
+      // 获取当前demographics应该使用的题库
+      const currentScaleIds = assessmentType === 'quick'
+        ? getAdaptiveScales(pendingProgress.demographics)
+        : getAdaptiveFullScales(pendingProgress.demographics);
+
+      // 构建有效题目ID集合
+      const validQuestionIds = new Set<string>();
+      currentScaleIds.forEach(scaleId => {
+        const scale = ALL_SCALES[scaleId];
+        if (scale) {
+          scale.questions.forEach(q => validQuestionIds.add(q.id));
+        }
+      });
+
+      // 过滤掉不属于当前题库的回答
+      const filteredResponses = pendingProgress.responses.filter(r =>
+        validQuestionIds.has(r.questionId)
+      );
+
+      // 如果有回答被过滤掉，显示警告对话框
+      const discardedCount = pendingProgress.responses.length - filteredResponses.length;
+      if (discardedCount > 0) {
+        console.warn(`检测到${discardedCount}个回答不属于当前题库版本，需要用户确认`);
+        setDataChangeInfo({
+          discardedCount,
+          totalCount: pendingProgress.responses.length
+        });
+        setShowDataChangeWarning(true);
+        return; // 等待用户确认
+      }
+
+      finalResponses = filteredResponses;
       setDemographics(pendingProgress.demographics);
     }
 
-    setResponses(pendingProgress.responses);
+    setResponses(finalResponses);
 
     const updatedSession: AssessmentSession = {
       ...baseSession,
       demographics: pendingProgress.demographics ?? baseSession.demographics,
-      responses: pendingProgress.responses,
+      responses: finalResponses,
       completed: false,
       endTime: undefined,
     };
 
     setSession(updatedSession);
     saveAssessmentSession(updatedSession);
+
+    // 🔧 Bug修复: 使用统一的清理函数彻底清除孤儿数据
+    if (finalResponses.length !== pendingProgress.responses.length) {
+      console.log(`继续作答时检测到孤儿数据，从${pendingProgress.responses.length}个回答过滤到${finalResponses.length}个有效回答`);
+      cleanupOrphanData(finalResponses, pendingProgress.demographics);
+    }
 
     setCurrentStep('questionnaire');
     setPendingProgress(null);
@@ -138,9 +221,76 @@ export default function Assessment() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 确认清除数据并继续
+  const handleConfirmDataChange = () => {
+    if (!pendingProgress) return;
+
+    const baseSession: AssessmentSession = session ?? {
+      id: sessionId,
+      type: assessmentType,
+      demographics: pendingProgress.demographics ?? ({} as Demographics),
+      responses: [],
+      startTime: new Date(),
+      completed: false,
+    };
+
+    // 重新过滤回答
+    let finalResponses = pendingProgress.responses;
+
+    if (pendingProgress.demographics) {
+      const currentScaleIds = assessmentType === 'quick'
+        ? getAdaptiveScales(pendingProgress.demographics)
+        : getAdaptiveFullScales(pendingProgress.demographics);
+
+      const validQuestionIds = new Set<string>();
+      currentScaleIds.forEach(scaleId => {
+        const scale = ALL_SCALES[scaleId];
+        if (scale) {
+          scale.questions.forEach(q => validQuestionIds.add(q.id));
+        }
+      });
+
+      finalResponses = pendingProgress.responses.filter(r =>
+        validQuestionIds.has(r.questionId)
+      );
+
+      setDemographics(pendingProgress.demographics);
+    }
+
+    setResponses(finalResponses);
+
+    const updatedSession: AssessmentSession = {
+      ...baseSession,
+      demographics: pendingProgress.demographics ?? baseSession.demographics,
+      responses: finalResponses,
+      completed: false,
+      endTime: undefined,
+    };
+
+    setSession(updatedSession);
+    saveAssessmentSession(updatedSession);
+
+    // 🔧 Bug修复: 使用统一的清理函数彻底清除孤儿数据
+    console.log(`确认数据变更，保留${finalResponses.length}个有效回答`);
+    cleanupOrphanData(finalResponses, pendingProgress.demographics);
+
+    setCurrentStep('questionnaire');
+    setPendingProgress(null);
+    setShowProgressDialog(false);
+    setShowDataChangeWarning(false);
+    setDataChangeInfo(null);
+    setResumeToken(Date.now());
+    setHasCheckedProgress(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleDiscardProgress = () => {
     closingProgressDialogRef.current = true;
+
+    // 🔧 Bug修复: 彻底清理所有数据，包括localStorage中的进度和session数据
     localStorage.removeItem('sri_assessment_progress');
+
+    // 清理内存状态
     setPendingProgress(null);
     setShowProgressDialog(false);
     setHasCheckedProgress(true);
@@ -148,18 +298,24 @@ export default function Assessment() {
     setResponses([]);
     setCurrentStep('consent');
     setResumeToken(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // 🔧 重置session为全新状态，并立即保存到localStorage
     if (session) {
-      setSession({
+      const cleanSession: AssessmentSession = {
         ...session,
         demographics: {} as Demographics,
         responses: [],
         startTime: new Date(),
         completed: false,
         endTime: undefined,
-      });
+      };
+      setSession(cleanSession);
+      // 立即保存清空的session，覆盖旧数据
+      saveAssessmentSession(cleanSession);
+      console.log('已重置session并清空所有回答数据');
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleProgressDialogOpenChange = (open: boolean) => {
@@ -208,6 +364,52 @@ export default function Assessment() {
 
   // 处理人口学信息提交
   const handleDemographicsSubmit = (demographicsData: Demographics) => {
+    // 🔧 检测demographics变化是否导致题库版本切换
+    if (demographics && responses.length > 0) {
+      // 获取旧题库和新题库的scaleIds
+      const oldScaleIds = assessmentType === 'quick'
+        ? getAdaptiveScales(demographics)
+        : getAdaptiveFullScales(demographics);
+
+      const newScaleIds = assessmentType === 'quick'
+        ? getAdaptiveScales(demographicsData)
+        : getAdaptiveFullScales(demographicsData);
+
+      // 比较题库是否发生变化
+      const scalesChanged = JSON.stringify(oldScaleIds.sort()) !== JSON.stringify(newScaleIds.sort());
+
+      if (scalesChanged) {
+        // 计算有多少回答会被清除
+        const newValidQuestionIds = new Set<string>();
+        newScaleIds.forEach(scaleId => {
+          const scale = ALL_SCALES[scaleId];
+          if (scale) {
+            scale.questions.forEach(q => newValidQuestionIds.add(q.id));
+          }
+        });
+
+        const filteredResponses = responses.filter(r => newValidQuestionIds.has(r.questionId));
+        const discardedCount = responses.length - filteredResponses.length;
+
+        if (discardedCount > 0) {
+          // 显示警告对话框
+          console.warn(`Demographics变更导致题库切换，将清除${discardedCount}个回答`);
+          setDataChangeInfo({
+            discardedCount,
+            totalCount: responses.length
+          });
+          // 暂存新的demographics，等待用户确认
+          setPendingProgress({
+            demographics: demographicsData,
+            responses: responses
+          });
+          setShowDataChangeWarning(true);
+          return; // 等待用户确认
+        }
+      }
+    }
+
+    // 没有题库变化或没有已有回答，直接提交
     setDemographics(demographicsData);
     if (session) {
       const updatedSession = {
@@ -216,6 +418,10 @@ export default function Assessment() {
       };
       setSession(updatedSession);
       saveAssessmentSession(updatedSession);
+
+      // 🔧 Bug修复: 使用统一的清理函数确保demographics同步
+      console.log('已更新demographics信息');
+      cleanupOrphanData(responses, demographicsData);
     }
     setCurrentStep('questionnaire');
     // 滚动到顶部以显示问卷开始部分
@@ -224,6 +430,29 @@ export default function Assessment() {
 
   // 处理问卷回答更新
   const handleResponseUpdate = (newResponses: Response[]) => {
+    // 🔧 Bug修复: 过滤掉不属于当前题库的回答（防御性编程）
+    if (demographics) {
+      const currentScaleIds = assessmentType === 'quick'
+        ? getAdaptiveScales(demographics)
+        : getAdaptiveFullScales(demographics);
+
+      const validQuestionIds = new Set<string>();
+      currentScaleIds.forEach(scaleId => {
+        const scale = ALL_SCALES[scaleId];
+        if (scale) {
+          scale.questions.forEach(q => validQuestionIds.add(q.id));
+        }
+      });
+
+      // 过滤掉无效的回答
+      const validResponses = newResponses.filter(r => validQuestionIds.has(r.questionId));
+
+      if (validResponses.length !== newResponses.length) {
+        console.warn(`检测到${newResponses.length - validResponses.length}个无效回答，已自动过滤`);
+        newResponses = validResponses;
+      }
+    }
+
     setResponses(newResponses);
     if (session) {
       const updatedSession = {
@@ -321,6 +550,52 @@ export default function Assessment() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 数据变更警告对话框 */}
+      <AlertDialog open={showDataChangeWarning} onOpenChange={setShowDataChangeWarning}>
+        <AlertDialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md rounded-xl p-6 space-y-6">
+          <AlertDialogHeader className="space-y-3">
+            <AlertDialogTitle className="text-xl font-semibold text-psychology-warning flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              题库版本已变更
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="text-sm text-muted-foreground space-y-2">
+                <div>
+                  检测到您修改了基本信息，导致题库版本发生变化。
+                </div>
+                <div className="font-medium text-foreground">
+                  将清除 {dataChangeInfo?.discardedCount ?? 0} 个不属于新题库的回答（共 {dataChangeInfo?.totalCount ?? 0} 个回答）
+                </div>
+                <div className="text-xs text-psychology-warning">
+                  ⚠️ 此操作不可撤销，建议重新开始以确保数据准确性
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center gap-2">
+            <AlertDialogCancel
+              onClick={() => {
+                setShowDataChangeWarning(false);
+                setDataChangeInfo(null);
+                handleDiscardProgress();
+              }}
+              className="w-full sm:w-auto transition-transform hover:scale-[1.02]"
+            >
+              重新开始
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDataChange}
+              className="w-full sm:w-auto bg-psychology-warning hover:bg-psychology-warning/90 transition-transform hover:scale-[1.02]"
+            >
+              继续并清除无效回答
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* 顶部导航 */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-muted">
         <div className="container mx-auto px-4 py-4">
