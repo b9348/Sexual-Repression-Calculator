@@ -118,7 +118,7 @@ export default function Home() {
                 </Link>
                 
                 <Link to="/assessment?type=full">
-                  <Button size="lg" variant="outline" className="border-psychology-primary text-psychology-primary hover:bg-psychology-primary/5 px-8 py-4 text-lg">
+                  <Button size="lg" variant="outline" className="border-psychology-primary text-psychology-primary hover:bg-psychology-primary hover:text-white transition-colors px-8 py-4 text-lg">
                     <Target className="w-5 h-5 mr-2" />
                     完整版测评
                   </Button>
@@ -265,7 +265,7 @@ export default function Home() {
                   </div>
 
                   <Link to="/assessment?type=full" className="block">
-                    <Button variant="outline" className="w-full border-psychology-secondary text-psychology-secondary hover:bg-psychology-secondary/5">
+                    <Button variant="outline" className="w-full border-psychology-secondary text-psychology-secondary hover:bg-psychology-secondary hover:text-white transition-colors">
                       开始完整测评
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -369,7 +369,7 @@ export default function Home() {
                     立即开始测评
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" asChild className="border-psychology-primary text-psychology-primary hover:bg-psychology-primary/5 px-8 py-4">
+                <Button size="lg" variant="outline" asChild className="border-psychology-primary text-psychology-primary hover:bg-psychology-primary hover:text-white transition-colors px-8 py-4">
                   <Link to="/guide">
                     <BookOpen className="w-5 h-5 mr-2" />
                     了解更多信息
