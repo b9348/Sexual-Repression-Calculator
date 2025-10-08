@@ -105,12 +105,34 @@ height: "0",
 "0%, 100%": { transform: "scale(1)" },
 "50%": { transform: "scale(1.05)" },
 },
+"slide-in-top": {
+"0%": {
+transform: "translateY(-120%)",
+opacity: "0",
+},
+"100%": {
+transform: "translateY(0)",
+opacity: "1",
+},
+},
+"slide-out-top": {
+"0%": {
+transform: "translateY(0)",
+opacity: "1",
+},
+"100%": {
+transform: "translateY(-120%)",
+opacity: "0",
+},
+},
 },
 animation: {
 "accordion-down": "accordion-down 0.2s ease-out",
 "accordion-up": "accordion-up 0.2s ease-out",
 "fade-in": "fade-in 0.5s ease-out",
 "pulse-scale": "pulse-scale 2s ease-in-out infinite",
+"slide-in-top": "slide-in-top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
+"slide-out-top": "slide-out-top 0.3s ease-in-out",
 },
 fontFamily: {
 sans: ["Inter", "system-ui", "sans-serif"],
