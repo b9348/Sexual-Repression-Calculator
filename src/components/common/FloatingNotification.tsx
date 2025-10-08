@@ -6,7 +6,15 @@ const NOTIFICATION_KEY = 'floating-notification-dismissed';
 export function FloatingNotification() {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
-  const [dragState, setDragState] = useState({ startY: 0, startX: 0, currentY: 0, currentX: 0, isDragging: false });
+  const [isEntering, setIsEntering] = useState(false);
+  const [dragState, setDragState] = useState({
+    startY: 0,
+    startX: 0,
+    currentY: 0,
+    currentX: 0,
+    isDragging: false,
+    dismissDirection: 'up' as 'up' | 'left' | 'right'
+  });
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -14,7 +22,11 @@ export function FloatingNotification() {
     const dismissed = sessionStorage.getItem(NOTIFICATION_KEY);
     if (!dismissed) {
       // 延迟一点显示，让动画更明显
-      setTimeout(() => setIsVisible(true), 500);
+      setTimeout(() => {
+        setIsVisible(true);
+        setIsEntering(true);
+        setTimeout(() => setIsEntering(false), 600); // 匹配原动画时长
+      }, 500);
     }
   }, []);
 
@@ -34,6 +46,7 @@ export function FloatingNotification() {
       currentY: 0,
       currentX: 0,
       isDragging: true,
+      dismissDirection: 'up',
     });
   };
 
@@ -58,18 +71,36 @@ export function FloatingNotification() {
     const absX = Math.abs(currentX);
     const absY = Math.abs(currentY);
 
-    // 上滑超过 80px 或侧滑超过 120px 就关闭
-    if (currentY < -80 || absX > 120) {
-      handleDismiss();
+    // 判断主要滑动方向和是否达到关闭阈值
+    let shouldDismiss = false;
+    let dismissDirection: 'up' | 'left' | 'right' = 'up';
+
+    if (currentY < -80 && absY > absX) {
+      shouldDismiss = true;
+      dismissDirection = 'up';
+    } else if (absX > 120 && absX > absY) {
+      shouldDismiss = true;
+      dismissDirection = currentX > 0 ? 'right' : 'left';
     }
 
-    setDragState({
-      startY: 0,
-      startX: 0,
-      currentY: 0,
-      currentX: 0,
-      isDragging: false,
-    });
+    if (shouldDismiss) {
+      setDragState(prev => ({
+        ...prev,
+        dismissDirection,
+        isDragging: false,
+      }));
+      handleDismiss();
+    } else {
+      // 不关闭时回弹到原位
+      setDragState({
+        startY: 0,
+        startX: 0,
+        currentY: 0,
+        currentX: 0,
+        isDragging: false,
+        dismissDirection: 'up',
+      });
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -79,6 +110,7 @@ export function FloatingNotification() {
       currentY: 0,
       currentX: 0,
       isDragging: true,
+      dismissDirection: 'up',
     });
   };
 
@@ -102,17 +134,36 @@ export function FloatingNotification() {
     const absX = Math.abs(currentX);
     const absY = Math.abs(currentY);
 
-    if (currentY < -80 || absX > 120) {
-      handleDismiss();
+    // 判断主要滑动方向和是否达到关闭阈值
+    let shouldDismiss = false;
+    let dismissDirection: 'up' | 'left' | 'right' = 'up';
+
+    if (currentY < -80 && absY > absX) {
+      shouldDismiss = true;
+      dismissDirection = 'up';
+    } else if (absX > 120 && absX > absY) {
+      shouldDismiss = true;
+      dismissDirection = currentX > 0 ? 'right' : 'left';
     }
 
-    setDragState({
-      startY: 0,
-      startX: 0,
-      currentY: 0,
-      currentX: 0,
-      isDragging: false,
-    });
+    if (shouldDismiss) {
+      setDragState(prev => ({
+        ...prev,
+        dismissDirection,
+        isDragging: false,
+      }));
+      handleDismiss();
+    } else {
+      // 不关闭时回弹到原位
+      setDragState({
+        startY: 0,
+        startX: 0,
+        currentY: 0,
+        currentX: 0,
+        isDragging: false,
+        dismissDirection: 'up',
+      });
+    }
   };
 
   useEffect(() => {
@@ -129,23 +180,55 @@ export function FloatingNotification() {
   if (!isVisible) return null;
 
   const getTransform = () => {
+    if (isEntering) {
+      return 'translateY(0)';
+    }
+
     if (dragState.isDragging) {
       // 拖拽时的位置，限制只能向上和侧向
       const y = Math.min(dragState.currentY, 0);
       const x = dragState.currentX;
       return `translate(${x}px, ${y}px)`;
     }
+
+    if (isDismissing) {
+      // 根据方向决定最终位置，从当前位置继续动画
+      const { dismissDirection, currentX, currentY } = dragState;
+      switch (dismissDirection) {
+        case 'up':
+          return `translate(${currentX}px, ${currentY - 100}vh)`;
+        case 'left':
+          return `translate(${currentX - 150}vw, ${currentY}px)`;
+        case 'right':
+          return `translate(${currentX + 150}vw, ${currentY}px)`;
+        default:
+          return 'translate(0, 0)';
+      }
+    }
+
     return 'translate(0, 0)';
   };
 
   const getOpacity = () => {
+    if (isEntering) return 1;
+
     if (dragState.isDragging) {
       const absX = Math.abs(dragState.currentX);
       const absY = Math.abs(dragState.currentY);
       const maxDrag = Math.max(absX / 120, absY / 80);
       return Math.max(0.3, 1 - maxDrag);
     }
+
+    if (isDismissing) return 0;
+
     return 1;
+  };
+
+  const getTransition = () => {
+    if (dragState.isDragging) return 'none';
+    if (isEntering) return 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease';
+    if (isDismissing) return 'transform 0.3s ease-in-out, opacity 0.3s ease';
+    return 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
   };
 
   return (
@@ -153,12 +236,12 @@ export function FloatingNotification() {
       ref={notificationRef}
       className={`
         fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl
-        ${isDismissing ? 'animate-slide-out-top' : 'animate-slide-in-top'}
+        ${isEntering ? 'opacity-0' : ''}
       `}
       style={{
         transform: getTransform(),
-        opacity: getOpacity(),
-        transition: dragState.isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
+        opacity: isEntering ? 0 : getOpacity(),
+        transition: getTransition(),
         touchAction: 'none',
       }}
     >
