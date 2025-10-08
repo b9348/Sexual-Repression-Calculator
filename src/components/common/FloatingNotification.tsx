@@ -177,7 +177,7 @@ export function FloatingNotification() {
             <div className="flex flex-col gap-2 text-sm font-medium leading-relaxed">
               {/* 左半部分 - 白色文字 */}
               <div style={{ color: '#FFFFFF' }}>
-                倒卖严重，纯免费测试。
+                性压抑指数计算器完全免费
               </div>
               {/* 右半部分 - 黑色文字 + 橙色背景方块 */}
               <div className="inline-flex items-center gap-1">
@@ -188,8 +188,16 @@ export function FloatingNotification() {
                     color: '#000000'
                   }}
                 >
-                  如果支付所谓链接免费但<span className="font-bold">「人工整合费用」</span>，请立即退款，不要助长违法行为。
+                  如果支付所谓链接免费但<span className="font-bold">「人工整合费用」</span>，请立即退款，以免助长违法商家嚣张气焰
                 </span>
+              </div>
+              {/* 反馈提示 */}
+              <div
+                className="text-xs cursor-pointer hover:underline"
+                style={{ color: '#FFFFFF' }}
+                onClick={() => window.open('https://kcnyvaj540jn.feishu.cn/share/base/form/shrcnFXbyBDDBdWKbFXj8TGKXme', '_blank')}
+              >
+                如果此网址链接是您购买得来，轻触此区域可反馈，将会联系违法店铺下架或追诉。
               </div>
             </div>
           </div>
