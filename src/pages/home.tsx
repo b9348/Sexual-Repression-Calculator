@@ -424,6 +424,17 @@ export default function Home() {
             
             <div className="border-t border-muted mt-8 pt-8 text-center text-sm text-muted-foreground">
               <p>© 2025 性压抑指数计算器. 仅供教育和自我了解使用，不能替代专业心理健康服务。</p>
+              <p className="mt-2">
+                开源仓库：
+                <a
+                  href="https://github.com/lamos22/Sexual-Repression-Calculator"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 hover:text-psychology-primary"
+                >
+                  GitHub - Sexual-Repression-Calculator
+                </a>
+              </p>
             </div>
           </div>
         </footer>
