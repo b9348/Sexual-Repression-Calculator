@@ -7,6 +7,8 @@ export function FloatingNotification() {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
+  const [isAutoDismissing, setIsAutoDismissing] = useState(false);
+  const [countdown, setCountdown] = useState(5);
   const [dragState, setDragState] = useState({
     startY: 0,
     startX: 0,
@@ -30,12 +32,13 @@ export function FloatingNotification() {
     }
   }, []);
 
-  const handleDismiss = () => {
+  const handleDismiss = (mode: 'auto' | 'manual' | 'drag' = 'manual') => {
+    setIsAutoDismissing(mode === 'auto');
     setIsDismissing(true);
     sessionStorage.setItem(NOTIFICATION_KEY, 'true');
     setTimeout(() => {
       setIsVisible(false);
-    }, 300);
+    }, mode === 'auto' ? 600 : 300);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -177,6 +180,23 @@ export function FloatingNotification() {
     }
   }, [dragState.isDragging, dragState.startY, dragState.startX]);
 
+  // 启动 5 秒倒计时，结束后自动关闭
+  useEffect(() => {
+    if (!isVisible || isEntering || isDismissing) return;
+    setCountdown(5);
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleDismiss('auto');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isVisible, isEntering, isDismissing]);
+
   if (!isVisible) return null;
 
   const getTransform = () => {
@@ -192,7 +212,11 @@ export function FloatingNotification() {
     }
 
     if (isDismissing) {
-      // 根据方向决定最终位置，从当前位置继续动画
+      if (isAutoDismissing) {
+        // 自动关闭：原地淡出（反向播放进入动画的感觉）
+        return 'translate(0, 0)';
+      }
+      // 手动/拖拽关闭：方向性位移动画
       const { dismissDirection, currentX, currentY } = dragState;
       switch (dismissDirection) {
         case 'up':
@@ -227,7 +251,9 @@ export function FloatingNotification() {
   const getTransition = () => {
     if (dragState.isDragging) return 'none';
     if (isEntering) return 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease';
-    if (isDismissing) return 'transform 0.3s ease-in-out, opacity 0.3s ease';
+    if (isDismissing) return isAutoDismissing
+      ? 'opacity 0.6s ease'
+      : 'transform 0.3s ease-in-out, opacity 0.3s ease';
     return 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
   };
 
@@ -235,7 +261,7 @@ export function FloatingNotification() {
     <div
       ref={notificationRef}
       className={`
-        fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl
+        fixed top-0 left-0 right-0 z-[55] mx-auto max-w-2xl
         ${isEntering ? 'opacity-0' : ''}
       `}
       style={{
@@ -256,7 +282,7 @@ export function FloatingNotification() {
           onMouseDown={handleMouseDown}
         >
           {/* 内容区域 */}
-          <div className="px-5 py-4 pr-12">
+          <div className="px-5 py-4">
             <div className="flex flex-col gap-2 text-sm font-medium leading-relaxed">
               {/* 左半部分 - 白色文字 */}
               <div style={{ color: '#FFFFFF' }}>
@@ -287,13 +313,14 @@ export function FloatingNotification() {
 
           {/* 关闭按钮 */}
           <button
-            onClick={handleDismiss}
-            className="absolute top-3 right-3 p-1.5 rounded-full transition-colors"
+            onClick={() => handleDismiss('manual')}
+            className="absolute top-3 right-3 p-1.5 rounded-full transition-colors flex items-center gap-1"
             style={{ color: '#FFFFFF' }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             aria-label="关闭通知"
           >
+            <span className="text-xs font-medium">{countdown}</span>
             <X className="w-4 h-4" />
           </button>
 
