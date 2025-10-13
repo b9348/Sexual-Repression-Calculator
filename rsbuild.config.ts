@@ -34,6 +34,12 @@ var _hmt = _hmt || [];
     },
     legalComments: "none",
   },
+  server: {
+    publicDir: {
+      name: "public",
+      copyOnBuild: true, // 确保构建时复制 public 目录（包括 404.html）
+    },
+  },
   dev: {
     watchFiles: {
       paths: ["./src/server"],
