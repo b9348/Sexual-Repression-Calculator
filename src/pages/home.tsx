@@ -45,7 +45,7 @@ export default function Home() {
                 <Brain className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-lg text-psychology-primary">SRI Calculator</h1>
+                <div className="font-bold text-lg text-psychology-primary">SRI Calculator</div>
                 <p className="text-xs text-muted-foreground">性压抑指数计算器</p>
               </div>
             </div>

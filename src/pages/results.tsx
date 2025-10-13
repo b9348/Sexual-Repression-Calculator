@@ -291,9 +291,9 @@ export default function Results() {
               </Button>
               <div className="flex items-center gap-2">
                 <Brain className="w-5 h-5 text-psychology-primary" />
-                <span className="font-semibold text-psychology-primary">
-                  SRI 评估结果
-                </span>
+                <h1 className="font-semibold text-psychology-primary">
+                  性压抑指数(SRI)评估结果
+                </h1>
               </div>
             </div>
 

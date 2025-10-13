@@ -612,9 +612,9 @@ export default function Assessment() {
               </Button>
               <div className="flex items-center gap-2">
                 <Brain className="w-5 h-5 text-psychology-primary" />
-                <span className="font-semibold text-psychology-primary">
-                  {assessmentType === 'quick' ? '快速测评' : '完整测评'}
-                </span>
+                <h1 className="font-semibold text-psychology-primary">
+                  {assessmentType === 'quick' ? '快速测评 - 性压抑指数评估' : '完整测评 - 性压抑指数评估'}
+                </h1>
               </div>
             </div>
 
