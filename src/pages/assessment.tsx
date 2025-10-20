@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { AlertTriangle, CheckCircle, ArrowLeft, Home, Brain } from 'lucide-react';
+import { SEO } from '@/components/common/SEO';
 import { AssessmentSession, Demographics, Response } from '@/types';
 import { calculateAssessmentResults } from '@/lib/calculator';
 import { saveAssessmentSession } from '@/lib/storage';
@@ -595,6 +596,14 @@ export default function Assessment() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <SEO
+        title={`${assessmentType === 'quick' ? '快速测评' : '完整测评'} - 性压抑指数计算器 | SRI Calculator`}
+        description={`开始您的性压抑指数(SRI)${assessmentType === 'quick' ? '快速测评(8-15分钟)' : '完整测评(25-40分钟)'}，基于国际认可量表的专业性心理评估，100%本地数据处理，保护隐私安全。`}
+        keywords="性压抑测评,SRI测试,性心理评估,在线心理测试,性健康评估"
+        canonicalUrl="https://xyy.gta4.bio/assessment"
+        noindex={true}
+      />
 
       {/* 顶部导航 */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-muted">

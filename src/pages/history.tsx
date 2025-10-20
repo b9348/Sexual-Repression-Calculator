@@ -9,6 +9,7 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
 import {Progress} from '@/components/ui/progress';
+import {SEO} from '@/components/common/SEO';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -120,12 +121,21 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-psychology-calm to-psychology-warm flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-psychology-primary" />
-          <p className="text-lg text-muted-foreground">加载历史记录...</p>
+      <>
+        <SEO
+          title="历史记录 - 性压抑指数计算器 | SRI Calculator"
+          description="查看和管理您的性压抑指数(SRI)测评历史记录，包括过往测评结果、趋势分析和数据导出功能。"
+          keywords="测评历史,SRI记录,历史结果,测评管理,数据导出"
+          canonicalUrl="https://xyy.gta4.bio/history"
+          noindex={true}
+        />
+        <div className="min-h-screen bg-gradient-to-b from-psychology-calm to-psychology-warm flex items-center justify-center">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-psychology-primary" />
+            <p className="text-lg text-muted-foreground">加载历史记录...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 

@@ -9,14 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  BookOpen, 
-  Clock, 
-  Shield, 
-  AlertTriangle, 
-  CheckCircle, 
-  Users, 
-  Brain, 
+import { SEO } from '@/components/common/SEO';
+import {
+  BookOpen,
+  Clock,
+  Shield,
+  AlertTriangle,
+  CheckCircle,
+  Users,
+  Brain,
   Home,
   ArrowRight,
   Lightbulb,
@@ -28,16 +29,23 @@ import {
 
 export default function Guide() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
-      {/* 装饰背景 */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-psychology-primary/5 rounded-full blur-xl"></div>
-        <div className="absolute top-40 right-16 w-24 h-24 bg-psychology-accent/5 rounded-full blur-lg"></div>
-        <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-psychology-secondary/5 rounded-full blur-xl"></div>
-      </div>
+    <>
+      <SEO
+        title="使用指南 - 性压抑指数计算器 | SRI Calculator"
+        description="详细了解如何正确使用性压抑指数(SRI)评估工具，包括测评流程、注意事项、结果解读等完整指南。帮助您获得准确可靠的测评结果。"
+        keywords="SRI使用指南,性压抑测评指南,心理测评流程,测评注意事项,结果解读,性心理评估教程"
+        canonicalUrl="https://xyy.gta4.bio/guide"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
+        {/* 装饰背景 */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-psychology-primary/5 rounded-full blur-xl"></div>
+          <div className="absolute top-40 right-16 w-24 h-24 bg-psychology-accent/5 rounded-full blur-lg"></div>
+          <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-psychology-secondary/5 rounded-full blur-xl"></div>
+        </div>
 
-      {/* 导航栏 */}
-      <nav className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-border/50">
+        {/* 导航栏 */}
+        <nav className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-border/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
@@ -315,6 +323,7 @@ export default function Guide() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -10,14 +10,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Brain, 
-  Home, 
-  Download, 
-  Share2, 
-  BarChart3, 
-  TrendingUp, 
-  Shield, 
+import { SEO } from '@/components/common/SEO';
+import {
+  Brain,
+  Home,
+  Download,
+  Share2,
+  BarChart3,
+  TrendingUp,
+  Shield,
   Info,
   CheckCircle,
   AlertCircle,
@@ -197,19 +198,28 @@ export default function Results() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm flex items-center justify-center">
-        <Card className="w-full max-w-md p-8">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-psychology-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <RefreshCw className="w-8 h-8 text-psychology-primary animate-spin" />
+      <>
+        <SEO
+          title="测评结果 - 性压抑指数计算器 | SRI Calculator"
+          description="查看您的性压抑指数(SRI)测评结果，包括详细的四维度分析、个性化建议和专业解读。"
+          keywords="SRI结果,性压抑指数结果,测评报告,心理评估结果"
+          canonicalUrl="https://xyy.gta4.bio/results"
+          noindex={true}
+        />
+        <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm flex items-center justify-center">
+          <Card className="w-full max-w-md p-8">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-psychology-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <RefreshCw className="w-8 h-8 text-psychology-primary animate-spin" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold mb-2">加载结果中</h2>
+                <p className="text-muted-foreground">正在获取您的评估结果...</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold mb-2">加载结果中</h2>
-              <p className="text-muted-foreground">正在获取您的评估结果...</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
+      </>
     );
   }
 

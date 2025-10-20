@@ -9,13 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Brain, 
-  BookOpen, 
-  Home, 
-  Users, 
-  BarChart3, 
-  Award, 
+import { SEO } from '@/components/common/SEO';
+import {
+  Brain,
+  BookOpen,
+  Home,
+  Users,
+  BarChart3,
+  Award,
   Target,
   FileText,
   Globe,
@@ -27,16 +28,23 @@ import {
 
 export default function Science() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
-      {/* 装饰背景 */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-32 right-20 w-28 h-28 bg-psychology-accent/5 rounded-full blur-xl"></div>
-        <div className="absolute bottom-40 left-16 w-36 h-36 bg-psychology-primary/5 rounded-full blur-xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-psychology-secondary/3 rounded-full blur-2xl"></div>
-      </div>
+    <>
+      <SEO
+        title="科学依据 - 性压抑指数计算器 | SRI Calculator"
+        description="了解性压抑指数(SRI)评估工具的科学理论基础，包括SIS/SES、Mosher性内疚、KISS-9等国际认可量表的研究背景、信效度数据和学术应用。"
+        keywords="SRI科学依据,心理测量学,量表信效度,性心理研究,SIS/SES量表,Mosher性内疚,KISS-9,学术研究"
+        canonicalUrl="https://xyy.gta4.bio/science"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
+        {/* 装饰背景 */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-32 right-20 w-28 h-28 bg-psychology-accent/5 rounded-full blur-xl"></div>
+          <div className="absolute bottom-40 left-16 w-36 h-36 bg-psychology-primary/5 rounded-full blur-xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-psychology-secondary/3 rounded-full blur-2xl"></div>
+        </div>
 
-      {/* 导航栏 */}
-      <nav className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-border/50">
+        {/* 导航栏 */}
+        <nav className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-border/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
@@ -360,6 +368,7 @@ export default function Science() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,24 +1,32 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { SEO } from "@/components/common/SEO";
 import { Home } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-32 left-20 w-6 h-6 bg-blue-400 rounded-full opacity-40"></div>
-        <div className="absolute top-48 right-32 w-8 h-8 bg-purple-400 rounded-full opacity-30"></div>
-        <div className="absolute bottom-40 left-1/4 w-10 h-10 border-3 border-emerald-400 rounded-full opacity-50"></div>
-        <div className="absolute bottom-32 right-20 w-12 h-12 border-4 border-blue-400 rounded-full opacity-30"></div>
+    <>
+      <SEO
+        title="页面未找到 - 性压抑指数计算器 | SRI Calculator"
+        description="抱歉，您访问的页面不存在。返回首页继续使用性压抑指数(SRI)评估工具。"
+        canonicalUrl="https://xyy.gta4.bio/"
+        noindex={true}
+      />
+      <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-32 left-20 w-6 h-6 bg-blue-400 rounded-full opacity-40"></div>
+          <div className="absolute top-48 right-32 w-8 h-8 bg-purple-400 rounded-full opacity-30"></div>
+          <div className="absolute bottom-40 left-1/4 w-10 h-10 border-3 border-emerald-400 rounded-full opacity-50"></div>
+          <div className="absolute bottom-32 right-20 w-12 h-12 border-4 border-blue-400 rounded-full opacity-30"></div>
 
-        {/* Floating question marks */}
-        <div className="absolute top-1/4 left-16 text-6xl text-gray-300 opacity-20 font-bold">?</div>
-        <div className="absolute top-1/3 right-24 text-4xl text-gray-300 opacity-30 font-bold">?</div>
-        <div className="absolute bottom-1/4 right-1/3 text-5xl text-gray-300 opacity-25 font-bold">?</div>
-      </div>
+          {/* Floating question marks */}
+          <div className="absolute top-1/4 left-16 text-6xl text-gray-300 opacity-20 font-bold">?</div>
+          <div className="absolute top-1/3 right-24 text-4xl text-gray-300 opacity-30 font-bold">?</div>
+          <div className="absolute bottom-1/4 right-1/3 text-5xl text-gray-300 opacity-25 font-bold">?</div>
+        </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
         <div className="text-center max-w-2xl mx-auto">
           {/* 404 Number */}
           <div className="mb-8">
@@ -46,7 +54,8 @@ export default function NotFound() {
             </Button>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

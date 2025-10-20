@@ -8,13 +8,14 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Brain, 
-  Clock, 
-  Shield, 
-  Users, 
-  BarChart3, 
-  FileText, 
+import { SEO } from '@/components/common/SEO';
+import {
+  Brain,
+  Clock,
+  Shield,
+  Users,
+  BarChart3,
+  FileText,
   Heart,
   Zap,
   CheckCircle,
@@ -27,16 +28,23 @@ import {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-20 w-8 h-8 bg-psychology-primary/10 rounded-full"></div>
-        <div className="absolute top-40 right-32 w-12 h-12 bg-psychology-accent/10 rounded-full"></div>
-        <div className="absolute bottom-40 left-1/4 w-6 h-6 bg-psychology-secondary/10 rounded-full"></div>
-        <div className="absolute bottom-32 right-20 w-10 h-10 bg-psychology-primary/5 rounded-full"></div>
-      </div>
+    <>
+      <SEO
+        title="性压抑指数计算器 - 专业性心理健康评估工具 | SRI Calculator"
+        description="基于SIS/SES、Mosher性内疚、KISS-9等国际认可量表的专业性心理评估工具。提供快测版(8-15分钟)和完整版(25-40分钟)，100%本地数据处理，保护隐私安全。科学了解性心理特征，促进性健康发展。"
+        keywords="性压抑指数,SRI计算器,性心理评估,性健康测试,SIS/SES量表,性内疚测试,性羞耻评估,心理健康,性教育,亲密关系"
+        canonicalUrl="https://xyy.gta4.bio/"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
+        {/* 背景装饰 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-8 h-8 bg-psychology-primary/10 rounded-full"></div>
+          <div className="absolute top-40 right-32 w-12 h-12 bg-psychology-accent/10 rounded-full"></div>
+          <div className="absolute bottom-40 left-1/4 w-6 h-6 bg-psychology-secondary/10 rounded-full"></div>
+          <div className="absolute bottom-32 right-20 w-10 h-10 bg-psychology-primary/5 rounded-full"></div>
+        </div>
 
-      <div className="relative z-10">
+        <div className="relative z-10">
         {/* 导航栏 */}
         <nav className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -438,7 +446,8 @@ export default function Home() {
             </div>
           </div>
         </footer>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
