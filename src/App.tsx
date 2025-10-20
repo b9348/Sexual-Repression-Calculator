@@ -3,7 +3,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { FloatingNotification } from "@/components/common/FloatingNotification";
 import Index from "./pages/home";
 import Assessment from "./pages/assessment";
 import Results from "./pages/results";
@@ -19,7 +18,6 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster richColors />
-        <FloatingNotification />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
