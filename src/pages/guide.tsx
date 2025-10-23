@@ -33,7 +33,7 @@ export default function Guide() {
       <SEO
         title="使用指南 - 性压抑指数计算器 | SRI Calculator"
         description="详细了解如何正确使用性压抑指数(SRI)评估工具，包括测评流程、注意事项、结果解读等完整指南。帮助您获得准确可靠的测评结果。"
-        keywords="SRI使用指南,性压抑测评指南,心理测评流程,测评注意事项,结果解读,性心理评估教程"
+        keywords="SRI使用指南,性压抑测评指南,性压抑计算器,心理测评流程,测评注意事项,结果解读,性心理评估教程"
         canonicalUrl="https://xyy.gta4.bio/guide"
       />
       <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">

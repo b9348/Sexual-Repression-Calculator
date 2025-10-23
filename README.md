@@ -39,8 +39,8 @@ npm run dev
 # 构建生产版本
 npm run build
 
-# 启动生产服务器
-npm start
+# 部署
+使用 Cloudflare Pages 进行静态部署（无需服务器启动）
 ```
 
 ### 访问应用
@@ -91,11 +91,9 @@ SRI = Σ(标准化维度分数) → 0-100映射
 - **表单**: React Hook Form + Zod
 - **图标**: Lucide React
 
-### 后端技术栈
+### 部署与运行
 
-- **运行时**: Deno Edge Function
-- **框架**: Hono.js + zValidator
-- **数据验证**: Zod
+- **平台**: Cloudflare Pages（静态前端）
 - **构建工具**: Rsbuild
 
 ### 数据架构
@@ -121,7 +119,7 @@ src/
 │   ├── calculator/     # 计算引擎
 │   └── storage/        # 存储管理
 ├── types/              # TypeScript类型
-├── server/             # 服务端代码
+（已移除）无服务器代码目录，采用纯前端静态部署
 └── styles/             # 样式文件
 ```
 

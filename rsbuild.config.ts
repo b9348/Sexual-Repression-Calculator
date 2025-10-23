@@ -1,8 +1,7 @@
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { resolve } from "path";
-import { app } from "./src/server/app.dev";
-import { getRequestListener } from "@hono/node-server";
+// 已移除后端依赖，开发模式不再代理 /api
 
 export default defineConfig({
   plugins: [pluginReact()],
@@ -30,34 +29,17 @@ var _hmt = _hmt || [];
   },
   output: {
     distPath: {
-      root: "dist/web",
+      root: "dist",
     },
     legalComments: "none",
   },
   server: {
     publicDir: {
       name: "public",
-      copyOnBuild: true, // 确保构建时复制 public 目录（包括 404.html）
+      copyOnBuild: true,
     },
   },
-  dev: {
-    watchFiles: {
-      paths: ["./src/server"],
-      type: "reload-server",
-    },
-    setupMiddlewares: [
-      (middlewares) => {
-        middlewares.unshift((req, res, next) => {
-          if (req.url?.startsWith("/api")) {
-            const listener = getRequestListener(app.fetch);
-            listener(req, res);
-          } else {
-            next();
-          }
-        });
-      },
-    ],
-  },
+  dev: {},
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),

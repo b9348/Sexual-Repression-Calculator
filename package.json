@@ -5,18 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "rsbuild dev",
-    "build": "rsbuild build -c rsbuild.config.ts && rsbuild build -c rsbuild.config.server.ts",
+    "build": "rsbuild build -c rsbuild.config.ts",
     "build:client": "rsbuild build -c rsbuild.config.ts",
-    "build:server": "rsbuild build -c rsbuild.config.server.ts",
     "type-check": "tsc -b --pretty",
     "lint": "tsc -b --pretty",
     "preview": "rsbuild preview",
-    "start": "cd ./dist && deno run --allow-net --allow-read server.cjs",
     "deploy": "pnpm run build:client && gh-pages -d dist/web"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.4",
-    "@hono/zod-validator": "^0.7.0",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -45,13 +41,13 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-query": "^5.80.6",
-    "@types/deno": "^2.3.0",
+    
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
-    "hono": "^4.7.11",
+    
     "input-otp": "^1.4.2",
     "lucide-react": "^0.484.0",
     "motion": "^12.16.0",

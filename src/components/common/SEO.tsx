@@ -14,7 +14,7 @@ interface SEOProps {
 export function SEO({
   title = '性压抑指数计算器 - 专业性心理健康评估工具 | SRI Calculator',
   description = '基于SIS/SES、Mosher性内疚、KISS-9等国际认可量表的专业性心理评估工具。提供快测版(8-15分钟)和完整版(25-40分钟)，100%本地数据处理，保护隐私安全。科学了解性心理特征，促进性健康发展。',
-  keywords = '性压抑指数,SRI计算器,性心理评估,性健康测试,SIS/SES量表,性内疚测试,性羞耻评估,心理健康,性教育,亲密关系',
+  keywords = '性压抑指数,性压抑计算器,SRI计算器,性心理评估,性健康测试,SIS/SES量表,性内疚测试,性羞耻评估,心理健康,性教育,亲密关系',
   ogTitle,
   ogDescription,
   ogImage = 'https://xyy.gta4.bio/favicon.svg',
@@ -63,4 +63,3 @@ export function SEO({
     </Helmet>
   );
 }
-

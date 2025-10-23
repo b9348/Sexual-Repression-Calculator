@@ -6,10 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Commands
 - `npm run dev` - Start development server with hot reload
-- `npm run build` - Build both client and server for production
-- `npm run build:client` - Build only client bundle
-- `npm run build:server` - Build only server bundle
-- `npm run start` - Start production server (runs Deno from dist/server.cjs)
+- `npm run build` - Build client for production
+ - `npm run build:client` - Build only client bundle
+- （已弃用）`npm run start` - 之前用于 Deno 运行 dist/server.cjs，现基于 Cloudflare Pages 无需该命令
 - `npm run preview` - Preview production build
 - `npm run type-check` - Run TypeScript type checking
 - `npm run lint` - Run ESLint (also performs type checking)
@@ -23,7 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Technology Stack
 - **Frontend**: React 19 + TypeScript with Vite-style bundling via Rsbuild
-- **Backend**: Hono.js running on Deno Edge Functions
+- **Backend（已弃用）**: Deno Edge Functions（现改为前端静态部署）
 - **UI**: Tailwind CSS + shadcn/ui components
 - **State Management**: React Query + React Hooks
 - **Forms**: React Hook Form + Zod validation
@@ -70,7 +69,7 @@ src/
 │   ├── scales/         # Psychological scale definitions
 │   ├── calculator/     # SRI calculation engine
 │   └── storage/        # Local storage management
-├── server/             # Hono.js server (minimal API)
+（已移除）无服务器目录，采用纯前端静态部署
 └── types/              # TypeScript type definitions
 ```
 
@@ -89,10 +88,7 @@ Configured in both `tsconfig.json` and `rsbuild.config.ts`:
 - Progress tracking handles partial completion and resume functionality
 
 #### Server Setup
-The Hono.js server is minimal since all calculations happen client-side. Current setup:
-- Development: Middleware proxy routes `/api` calls to Hono app
-- Production: Separate server build running on Deno
-- API routes are placeholders (currently no server-side processing needed)
+（已移除）当前项目采用纯前端静态部署，无服务器代码
 
 #### TypeScript Configuration
 - Strict mode enabled

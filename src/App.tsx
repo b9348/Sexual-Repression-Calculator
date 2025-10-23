@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import RouteTitle from "@/components/common/RouteTitle";
 import Index from "./pages/home";
 import Assessment from "./pages/assessment";
 import Results from "./pages/results";
@@ -19,6 +20,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster richColors />
         <BrowserRouter>
+          <RouteTitle />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/assessment" element={<Assessment />} />

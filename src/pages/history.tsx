@@ -140,7 +140,15 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-psychology-calm to-psychology-warm">
+    <>
+      <SEO
+        title="历史记录 - 性压抑指数计算器 | SRI Calculator"
+        description="查看和管理您的性压抑指数(SRI)测评历史记录，包括过往测评结果、趋势分析和数据导出功能。"
+        keywords="测评历史,SRI记录,历史结果,测评管理,数据导出"
+        canonicalUrl="https://xyy.gta4.bio/history"
+        noindex={true}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-psychology-calm to-psychology-warm">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -463,6 +471,7 @@ export default function History() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
