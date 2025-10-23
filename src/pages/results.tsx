@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { SEO } from '@/components/common/SEO';
+import MonetagTag from '@/components/common/MonetagTag';
 import {
   Brain,
   Home,
@@ -285,6 +286,7 @@ export default function Results() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
+      {/* <MonetagTag zoneId="180108" /> */}
       {/* 顶部导航 */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-muted">
         <div className="container mx-auto px-4 py-4">
