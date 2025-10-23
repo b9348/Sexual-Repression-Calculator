@@ -116,6 +116,30 @@
         } catch (e) {}
       })();
     </script>
+    <!-- Monetag 全站脚本：默认首页/科普/指南/历史加载，测评与结果页跳过 -->
+    <script>
+      (function () {
+        try {
+          var path = location.pathname;
+          var allow = true;
+          // 避免在测评与结果页干扰体验（如需全站加载可移除此判断）
+          if (path === '/assessment' || path === '/results') allow = false;
+          if (!allow) return;
+
+          if (!window.__monetagZoneLoaded) window.__monetagZoneLoaded = {};
+          if (window.__monetagZoneLoaded['180108']) return;
+
+          var s = document.createElement('script');
+          s.src = 'https://fpyf8.com/88/tag.min.js';
+          s.async = true;
+          s.setAttribute('data-zone', '180108');
+          s.setAttribute('data-cfasync', 'false');
+          s.id = 'monetag-tag-180108';
+          document.body.appendChild(s);
+          window.__monetagZoneLoaded['180108'] = true;
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
   </body>
 </html>

@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
-import MonetagTag from '@/components/common/MonetagTag';
 import {
   Brain,
   Clock,
@@ -36,7 +35,7 @@ export default function Home() {
         keywords="性压抑指数,性压抑计算器,SRI计算器,性心理评估,性健康测试,SIS/SES量表,性内疚测试,性羞耻评估,心理健康,性教育,亲密关系"
         canonicalUrl="https://xyy.gta4.bio/"
       />
-      <MonetagTag zoneId="180108" />
+      {/* 首页由 index.html 全站脚本加载 Monetag，避免前端重复注入 */}
       <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm">
         {/* 背景装饰 */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
