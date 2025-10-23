@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://xyy.gta4.bio/sitemap.xml
