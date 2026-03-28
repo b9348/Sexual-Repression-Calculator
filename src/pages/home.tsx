@@ -134,7 +134,7 @@ export default function Home() {
                 </Link>
 
                 <a
-                  href="https://yp.gta4.bio"
+                  href="https://yp.gta4.bio?ref=xyy"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
