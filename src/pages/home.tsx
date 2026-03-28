@@ -133,18 +133,16 @@ export default function Home() {
                   </Button>
                 </Link>
 
-                {import.meta.env.VITE_EXTERNAL_BUTTON_TEXT && import.meta.env.VITE_EXTERNAL_BUTTON_URL && (
-                  <a
-                    href={import.meta.env.VITE_EXTERNAL_BUTTON_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button size="lg" variant="outline" className="border-psychology-accent text-psychology-accent hover:bg-psychology-accent hover:text-white transition-colors px-8 py-4 text-lg">
-                      <Star className="w-5 h-5 mr-2" />
-                      {import.meta.env.VITE_EXTERNAL_BUTTON_TEXT}
-                    </Button>
-                  </a>
-                )}
+                <a
+                  href="https://yp.gta4.bio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button size="lg" variant="outline" className="border-psychology-accent text-psychology-accent hover:bg-psychology-accent hover:text-white transition-colors px-8 py-4 text-lg">
+                    <Star className="w-5 h-5 mr-2" />
+                    约炮模拟器
+                  </Button>
+                </a>
               </div>
 
               {/* 核心指标展示 */}

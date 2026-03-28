@@ -5,16 +5,6 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [pluginReact()],
-  source: {
-    define: {
-      "import.meta.env.VITE_EXTERNAL_BUTTON_TEXT": JSON.stringify(
-        process.env.VITE_EXTERNAL_BUTTON_TEXT || ""
-      ),
-      "import.meta.env.VITE_EXTERNAL_BUTTON_URL": JSON.stringify(
-        process.env.VITE_EXTERNAL_BUTTON_URL || ""
-      ),
-    },
-  },
   html: {
     template: "./index.html",
     tags: [
