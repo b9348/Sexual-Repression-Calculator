@@ -143,6 +143,17 @@ export default function Home() {
                     约炮模拟器
                   </Button>
                 </a>
+
+                <a
+                  href="https://sbti.gta4.bio/?ref=xyy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button size="lg" variant="outline" className="border-psychology-secondary text-psychology-secondary hover:bg-psychology-secondary hover:text-white transition-colors px-8 py-4 text-lg">
+                    <Users className="w-5 h-5 mr-2" />
+                    SBTI人格测试
+                  </Button>
+                </a>
               </div>
 
               {/* 核心指标展示 */}
