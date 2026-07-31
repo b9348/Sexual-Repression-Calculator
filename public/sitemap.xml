@@ -4,17 +4,17 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://xyy.gta4.bio/</loc>
+    <loc>https://xxy.srewlv.com/</loc>
     <lastmod>2025-10-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xyy.gta4.bio/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://xyy.gta4.bio/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xxy.srewlv.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xxy.srewlv.com/" />
   </url>
 
   <!-- Assessment Page -->
   <url>
-    <loc>https://xyy.gta4.bio/assessment</loc>
+    <loc>https://xxy.srewlv.com/assessment</loc>
     <lastmod>2025-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- Guide Page -->
   <url>
-    <loc>https://xyy.gta4.bio/guide</loc>
+    <loc>https://xxy.srewlv.com/guide</loc>
     <lastmod>2025-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -30,7 +30,7 @@
 
   <!-- Science Page -->
   <url>
-    <loc>https://xyy.gta4.bio/science</loc>
+    <loc>https://xxy.srewlv.com/science</loc>
     <lastmod>2025-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -38,7 +38,7 @@
 
   <!-- History Page -->
   <url>
-    <loc>https://xyy.gta4.bio/history</loc>
+    <loc>https://xxy.srewlv.com/history</loc>
     <lastmod>2025-10-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -46,7 +46,7 @@
 
   <!-- Results Page -->
   <url>
-    <loc>https://xyy.gta4.bio/results</loc>
+    <loc>https://xxy.srewlv.com/results</loc>
     <lastmod>2025-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

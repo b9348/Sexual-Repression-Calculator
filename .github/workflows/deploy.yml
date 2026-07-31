@@ -56,4 +56,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/web
           publish_branch: gh-pages
-          cname: xyy.gta4.bio
+          cname: xxy.srewlv.com

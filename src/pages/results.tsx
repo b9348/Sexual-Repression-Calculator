@@ -204,7 +204,7 @@ export default function Results() {
           title="测评结果 - 性压抑指数计算器 | SRI Calculator"
           description="查看您的性压抑指数(SRI)测评结果，包括详细的四维度分析、个性化建议和专业解读。"
           keywords="SRI结果,性压抑指数结果,性压抑计算器,测评报告,心理评估结果"
-          canonicalUrl="https://xyy.gta4.bio/results"
+          canonicalUrl="https://xxy.srewlv.com/results"
           noindex={true}
         />
         <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-white to-psychology-warm flex items-center justify-center">

@@ -9,7 +9,7 @@ export default function NotFound() {
       <SEO
         title="页面未找到 - 性压抑指数计算器 | SRI Calculator"
         description="抱歉，您访问的页面不存在。返回首页继续使用性压抑指数(SRI)评估工具。"
-        canonicalUrl="https://xyy.gta4.bio/"
+        canonicalUrl="https://xxy.srewlv.com/"
         noindex={true}
       />
       <div className="min-h-screen bg-gray-50 relative overflow-hidden">

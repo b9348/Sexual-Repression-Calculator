@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://xyy.gta4.bio/sitemap.xml
+Sitemap: https://xxy.srewlv.com/sitemap.xml

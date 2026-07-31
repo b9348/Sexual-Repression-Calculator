@@ -33,7 +33,7 @@ export default function Science() {
         title="科学依据 - 性压抑指数计算器 | SRI Calculator"
         description="了解性压抑指数(SRI)评估工具的科学理论基础，包括SIS/SES、Mosher性内疚、KISS-9等国际认可量表的研究背景、信效度数据和学术应用。"
         keywords="SRI科学依据,心理测量学,量表信效度,性心理研究,SIS/SES量表,Mosher性内疚,KISS-9,学术研究"
-        canonicalUrl="https://xyy.gta4.bio/science"
+        canonicalUrl="https://xxy.srewlv.com/science"
       />
       <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
         {/* 装饰背景 */}
