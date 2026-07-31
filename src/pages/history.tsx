@@ -126,7 +126,7 @@ export default function History() {
           title="历史记录 - 性压抑指数计算器 | SRI Calculator"
           description="查看和管理您的性压抑指数(SRI)测评历史记录，包括过往测评结果、趋势分析和数据导出功能。"
           keywords="测评历史,SRI记录,历史结果,测评管理,数据导出"
-          canonicalUrl="https://xxy.srewlv.com/history"
+          canonicalUrl="https://xyy.srewlv.com/history"
           noindex={true}
         />
         <div className="min-h-screen bg-gradient-to-b from-psychology-calm to-psychology-warm flex items-center justify-center">
@@ -145,7 +145,7 @@ export default function History() {
         title="历史记录 - 性压抑指数计算器 | SRI Calculator"
         description="查看和管理您的性压抑指数(SRI)测评历史记录，包括过往测评结果、趋势分析和数据导出功能。"
         keywords="测评历史,SRI记录,历史结果,测评管理,数据导出"
-        canonicalUrl="https://xxy.srewlv.com/history"
+        canonicalUrl="https://xyy.srewlv.com/history"
         noindex={true}
       />
       <div className="min-h-screen bg-gradient-to-b from-psychology-calm to-psychology-warm">
