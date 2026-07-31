@@ -1,10 +1,20 @@
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
+import { pluginPrerenderPlaywright } from "rsbuild-plugin-prerender-playwright";
 import { resolve } from "path";
-// 已移除后端依赖，开发模式不再代理 /api
 
 export default defineConfig({
-  plugins: [pluginReact()],
+  plugins: [
+    pluginReact(),
+    pluginPrerenderPlaywright({
+      routes: ["/", "/guide", "/science"],
+      skipThirdPartyRequests: true,
+      playwright: {
+        waitUntil: "networkidle",
+        timeout: 30000,
+      },
+    }),
+  ],
   html: {
     template: "./index.html",
     tags: [
