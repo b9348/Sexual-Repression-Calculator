@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { SEO } from '@/components/common/SEO';
+import { Helmet } from 'react-helmet-async';
 import {
   Brain,
   BookOpen,
@@ -35,6 +36,20 @@ export default function Science() {
         keywords="SRI科学依据,心理测量学,量表信效度,性心理研究,SIS/SES量表,Mosher性内疚,KISS-9,学术研究"
         canonicalUrl="https://xyy.srewlv.com/science"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "科学依据 - 性压抑指数计算器",
+          "description": "了解性压抑指数(SRI)评估工具的科学理论基础，包括SIS/SES、Mosher性内疚、KISS-9等国际认可量表的研究背景、信效度数据和学术应用。",
+          "url": "https://xyy.srewlv.com/science",
+          "isPartOf": {
+            "@type": "WebApplication",
+            "name": "性压抑指数计算器",
+            "url": "https://xyy.srewlv.com/"
+          }
+        })}</script>
+      </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
         {/* 装饰背景 */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">

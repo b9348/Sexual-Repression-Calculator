@@ -134,7 +134,7 @@ export default function Home() {
                 </Link>
 
                 <a
-                  href="https://yp.gta4.bio/?utm_source=xyy"
+                  href="https://yp.srewlv.com/?utm_source=xyy"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -145,7 +145,7 @@ export default function Home() {
                 </a>
 
                 <a
-                  href="https://sbti.gta4.bio/?utm_source=xyy"
+                  href="https://sbti.srewlv.com/?utm_source=xyy"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

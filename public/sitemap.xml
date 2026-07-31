@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <!-- Homepage -->
   <url>
     <loc>https://xyy.srewlv.com/</loc>
-    <lastmod>2025-10-20</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xyy.srewlv.com/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://xyy.srewlv.com/" />
-  </url>
-
-  <!-- Assessment Page -->
-  <url>
-    <loc>https://xyy.srewlv.com/assessment</loc>
-    <lastmod>2025-10-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
   </url>
 
   <!-- Guide Page -->
   <url>
     <loc>https://xyy.srewlv.com/guide</loc>
-    <lastmod>2025-10-20</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -31,7 +20,7 @@
   <!-- Science Page -->
   <url>
     <loc>https://xyy.srewlv.com/science</loc>
-    <lastmod>2025-10-20</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -39,17 +28,9 @@
   <!-- History Page -->
   <url>
     <loc>https://xyy.srewlv.com/history</loc>
-    <lastmod>2025-10-20</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Results Page -->
-  <url>
-    <loc>https://xyy.srewlv.com/results</loc>
-    <lastmod>2025-10-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 
 </urlset>

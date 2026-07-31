@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { SEO } from '@/components/common/SEO';
+import { Helmet } from 'react-helmet-async';
 import {
   BookOpen,
   Clock,
@@ -36,6 +37,20 @@ export default function Guide() {
         keywords="SRI使用指南,性压抑测评指南,性压抑计算器,心理测评流程,测评注意事项,结果解读,性心理评估教程"
         canonicalUrl="https://xyy.srewlv.com/guide"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "使用指南 - 性压抑指数计算器",
+          "description": "详细了解如何正确使用性压抑指数(SRI)评估工具，包括测评流程、注意事项、结果解读等完整指南。",
+          "url": "https://xyy.srewlv.com/guide",
+          "isPartOf": {
+            "@type": "WebApplication",
+            "name": "性压抑指数计算器",
+            "url": "https://xyy.srewlv.com/"
+          }
+        })}</script>
+      </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-psychology-calm via-background to-psychology-warm">
         {/* 装饰背景 */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">

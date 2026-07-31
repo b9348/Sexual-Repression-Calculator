@@ -17,7 +17,7 @@ export function SEO({
   keywords = '性压抑指数,性压抑计算器,SRI计算器,性心理评估,性健康测试,SIS/SES量表,性内疚测试,性羞耻评估,心理健康,性教育,亲密关系',
   ogTitle,
   ogDescription,
-  ogImage = 'https://xyy.srewlv.com/favicon.svg',
+  ogImage = 'https://iph.href.lu/1200x630?text=性压抑指数计算器',
   canonicalUrl = 'https://xyy.srewlv.com/',
   noindex = false,
 }: SEOProps) {
@@ -43,6 +43,8 @@ export function SEO({
       <meta property="og:title" content={finalOgTitle} />
       <meta property="og:description" content={finalOgDescription} />
       <meta property="og:image" content={ogImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:locale" content="zh_CN" />
       <meta property="og:site_name" content="性压抑指数计算器" />
 
@@ -55,11 +57,6 @@ export function SEO({
 
       {/* Canonical URL */}
       <link rel="canonical" href={canonicalUrl} />
-
-      {/* Alternate Languages */}
-      <link rel="alternate" hrefLang="zh-CN" href={canonicalUrl} />
-      <link rel="alternate" hrefLang="en" href={canonicalUrl} />
-      <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
     </Helmet>
   );
 }
